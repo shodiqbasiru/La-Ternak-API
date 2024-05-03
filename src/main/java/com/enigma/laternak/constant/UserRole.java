@@ -1,4 +1,4 @@
-package com.rnigma.laternak.constant;
+package com.enigma.laternak.constant;
 
 public enum UserRole {
     ROLE_ADMIN,
