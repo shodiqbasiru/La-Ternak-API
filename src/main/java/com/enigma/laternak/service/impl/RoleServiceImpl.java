@@ -1,9 +1,9 @@
 package com.enigma.laternak.service.impl;
 
-import com.enigma.wmb_api.constant.UserRole;
-import com.enigma.wmb_api.entity.Role;
-import com.enigma.wmb_api.repository.RoleRepository;
-import com.enigma.wmb_api.service.RoleService;
+import com.enigma.laternak.constant.UserRole;
+import com.enigma.laternak.entity.Role;
+import com.enigma.laternak.repository.RoleRepository;
+import com.enigma.laternak.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

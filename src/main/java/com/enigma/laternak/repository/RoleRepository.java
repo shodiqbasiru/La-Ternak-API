@@ -1,7 +1,7 @@
 package com.enigma.laternak.repository;
 
-import com.enigma.wmb_api.constant.UserRole;
-import com.enigma.wmb_api.entity.Role;
+import com.enigma.laternak.constant.UserRole;
+import com.enigma.laternak.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
