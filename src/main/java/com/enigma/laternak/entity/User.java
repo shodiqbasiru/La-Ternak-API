@@ -27,4 +27,11 @@ public class User {
     @OneToOne
     @JoinColumn(name = "account_id", unique = true)
     private Account account;
+
+    @OneToOne
+    @JoinColumn(name = "image_id", unique = true)
+    private ImageUser imageUser;
+
+    @OneToOne(mappedBy = "user")
+    private Store store;
 }
