@@ -1,6 +1,5 @@
 package com.enigma.laternak.dto.response;
 
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -10,10 +9,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterSellerResponse {
+public class LoginSellerResponse {
     private String username;
     private String email;
-    private String storeName;;
-    private boolean isVerified;
-    private List<String> roles;
+    private String token;
+    private List<String> role;
 }
