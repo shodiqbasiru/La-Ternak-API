@@ -1,4 +1,7 @@
 package com.enigma.laternak.repository;
 
-public interface StoreRepository {
+import com.enigma.laternak.entity.Store;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface StoreRepository extends JpaRepository<Store, String> {
 }
