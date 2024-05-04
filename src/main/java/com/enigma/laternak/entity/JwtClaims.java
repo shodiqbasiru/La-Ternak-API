@@ -10,6 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class JwtClaims {
-    private String userAccountId;
+    private String accountId;
     private List<String> roles;
 }

@@ -14,4 +14,9 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         return userRepository.saveAndFlush(user);
     }
+
+    @Override
+    public User getById(String id) {
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }

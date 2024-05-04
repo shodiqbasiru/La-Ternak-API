@@ -1,9 +1,9 @@
 package com.enigma.laternak.security;
 
-import com.enigma.wmb_api.entity.JwtClaims;
-import com.enigma.wmb_api.entity.UserAccount;
-import com.enigma.wmb_api.service.JwtService;
-import com.enigma.wmb_api.service.UserService;
+import com.enigma.laternak.entity.Account;
+import com.enigma.laternak.entity.JwtClaims;
+import com.enigma.laternak.service.JwtService;
+import com.enigma.laternak.service.UserServiceDetail;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @Slf4j
 public class AuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final UserService userService;
+    private final UserServiceDetail userServiceDetail;
     final String AUTH_HEADER = "Authorization";
 
     @Override
@@ -34,7 +34,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         try {
             String bearerToken = request.getHeader(AUTH_HEADER);
             JwtClaims claimsByToken = jwtService.getClaimsByToken(bearerToken);
-            UserAccount account = userService.getByUserId(claimsByToken.getUserAccountId());
+            Account account = userServiceDetail.getUserById(claimsByToken.getAccountId());
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     account.getUsername(),
                     null,

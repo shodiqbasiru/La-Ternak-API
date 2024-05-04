@@ -1,6 +1,6 @@
 package com.enigma.laternak.security;
 
-import com.enigma.wmb_api.dto.response.CommonResponse;
+import com.enigma.laternak.dto.response.CommonResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

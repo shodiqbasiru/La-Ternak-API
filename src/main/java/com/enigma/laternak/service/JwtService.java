@@ -1,10 +1,10 @@
 package com.enigma.laternak.service;
 
-import com.enigma.wmb_api.entity.JwtClaims;
-import com.enigma.wmb_api.entity.UserAccount;
+import com.enigma.laternak.entity.Account;
+import com.enigma.laternak.entity.JwtClaims;
 
 public interface JwtService {
-    String generateToken(UserAccount account);
+    String generateToken(Account account);
     boolean verifyJwtToken(String token);
     JwtClaims getClaimsByToken(String token);
 }
