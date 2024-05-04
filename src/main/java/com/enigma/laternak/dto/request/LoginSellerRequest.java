@@ -1,4 +1,4 @@
-package com.enigma.laternak.service;
+package com.enigma.laternak.dto.request;
 
 import lombok.*;
 

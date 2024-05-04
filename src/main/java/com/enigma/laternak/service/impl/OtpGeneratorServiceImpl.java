@@ -1,6 +1,6 @@
 package com.enigma.laternak.service.impl;
 
-import com.enigma.wmb_api.service.OtpGeneratorService;
+import com.enigma.laternak.service.OtpGeneratorService;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;

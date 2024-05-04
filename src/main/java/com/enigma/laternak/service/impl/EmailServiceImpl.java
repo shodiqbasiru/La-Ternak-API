@@ -1,7 +1,7 @@
 package com.enigma.laternak.service.impl;
 
-import com.enigma.wmb_api.dto.request.EmailRequest;
-import com.enigma.wmb_api.service.EmailService;
+import com.enigma.laternak.dto.request.EmailRequest;
+import com.enigma.laternak.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +23,5 @@ public class EmailServiceImpl implements EmailService {
         messageHelper.setSubject(request.getSubject());
         messageHelper.setText(request.getBody(), true);
         javaMailSender.send(mimeMessage);
-
-        /*
-        * SimpleMailMessage mailMessage = new SimpleMailMessage();
-        * mailMessage.setTo(request.getTo());
-        * mailMessage.setSubject(request.getSubject());
-        * mailMessage.setText(request.getBody());
-        * javaMailSender.send(mailMessage);
-        * */
     }
 }
