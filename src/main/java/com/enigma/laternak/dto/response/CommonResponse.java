@@ -12,5 +12,4 @@ public class CommonResponse<T> {
     private String message;
     private T data;
     private PagingResponse pagingResponse;
-//    private PaginationResponse pages;
 }
