@@ -19,7 +19,7 @@ public class User {
     private String customerName;
 
     @Column(name = "number_phone", nullable = false, length = 15)
-    private String numberPhone;
+    private String phoneNumber;
 
     @Column(name = "address")
     private String address;

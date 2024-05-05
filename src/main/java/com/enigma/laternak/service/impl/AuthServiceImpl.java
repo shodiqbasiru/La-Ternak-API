@@ -13,8 +13,10 @@ import com.enigma.laternak.entity.User;
 import com.enigma.laternak.repository.AccountRepository;
 import com.enigma.laternak.service.*;
 import com.enigma.laternak.util.ValidationUtil;
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +46,30 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final ValidationUtil validation;
+
+    @Value("${la_ternak.username.admin}")
+    private String adminUsername;
+
+    @Value("${la_ternak.password.admin}")
+    private String adminPassword;
+
+    @Transactional(rollbackFor = Exception.class)
+    @PostConstruct
+    public void initAdmin() {
+        Optional<Account> account = accountRepository.findByUsername(adminUsername);
+        if (account.isPresent()) return;
+
+        Role role = roleService.getOrSave(UserRole.ROLE_ADMIN);
+        String hashPassword = passwordEncoder.encode(adminPassword);
+
+        Account admin = Account.builder()
+                .username("admin")
+                .password(hashPassword)
+                .roles(List.of(role))
+                .isEnable(true)
+                .build();
+        accountRepository.saveAndFlush(admin);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -62,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = User.builder()
                 .customerName(request.getName())
-                .numberPhone(request.getPhoneNumber())
+                .phoneNumber(request.getPhoneNumber())
                 .account(account)
                 .build();
         userService.create(user);
