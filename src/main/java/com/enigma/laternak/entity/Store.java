@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -38,4 +39,7 @@ public class Store {
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private User user;
+
+    @OneToMany(mappedBy = "store")
+    private List<Product> products;
 }
