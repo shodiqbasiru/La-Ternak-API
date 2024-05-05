@@ -4,10 +4,8 @@ import com.enigma.laternak.dto.request.PaginationUserRequest;
 import com.enigma.laternak.dto.response.AccountResponse;
 import com.enigma.laternak.dto.response.StoreResponse;
 import com.enigma.laternak.dto.response.UserResponse;
-import com.enigma.laternak.entity.Account;
 import com.enigma.laternak.entity.User;
 import com.enigma.laternak.repository.UserRepository;
-import com.enigma.laternak.service.AuthService;
 import com.enigma.laternak.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,8 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
