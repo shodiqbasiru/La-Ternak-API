@@ -4,9 +4,12 @@ import com.enigma.laternak.dto.request.PaginationUserRequest;
 import com.enigma.laternak.dto.response.AccountResponse;
 import com.enigma.laternak.dto.response.StoreResponse;
 import com.enigma.laternak.dto.response.UserResponse;
+import com.enigma.laternak.entity.Account;
 import com.enigma.laternak.entity.User;
 import com.enigma.laternak.repository.UserRepository;
+import com.enigma.laternak.service.AuthService;
 import com.enigma.laternak.service.UserService;
+import com.enigma.laternak.service.UserServiceDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserServiceDetail userServiceDetail;
 
     @Override
     public User create(User user) {
@@ -55,6 +59,13 @@ public class UserServiceImpl implements UserService {
                         .address(user.getStore().getAddress())
                         .build())
                 .build());
+    }
+
+    @Override
+    public void deleteAccountUser(String id) {
+        User currentUser = getById(id);
+        Account currentAccount = userServiceDetail.getUserById(currentUser.getId());
+        currentAccount.setIsEnable(false);
     }
 
 }

@@ -26,11 +26,19 @@ public class StoreServiceImpl implements StoreService {
         storeRepository.saveAndFlush(request);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Store getByEmail(String email) {
         return storeRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("email not found"));
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Store getById(String id) {
+        return storeRepository.findById(id).orElseThrow(() -> new RuntimeException("store not found"));
+    }
+
+    @Transactional(readOnly = true)
     @Override
     public Page<StoreResponse> getAll(PaginationStoreRequest request) {
         if (request.getPage() <= 0) request.setPage(1);
@@ -54,8 +62,17 @@ public class StoreServiceImpl implements StoreService {
                 .build());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateStore(Store store) {
         storeRepository.saveAndFlush(store);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteAccountSeller(String id) {
+        Store currentStore = getById(id);
+        currentStore.setVerified(false);
+        currentStore.setActive(false);
     }
 }

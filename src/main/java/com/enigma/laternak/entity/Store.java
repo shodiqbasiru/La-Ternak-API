@@ -36,6 +36,9 @@ public class Store {
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private User user;

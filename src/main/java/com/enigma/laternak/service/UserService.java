@@ -11,4 +11,6 @@ public interface UserService {
     User getById(String id);
 
     Page<UserResponse> getAll(PaginationUserRequest request);
+
+    void deleteAccountUser(String id);
 }

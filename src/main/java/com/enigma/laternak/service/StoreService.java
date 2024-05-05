@@ -10,7 +10,11 @@ public interface StoreService {
 
     Store getByEmail(String email);
 
+    Store getById(String id);
+
     Page<StoreResponse> getAll(PaginationStoreRequest request);
 
     void updateStore(Store store);
+
+    void deleteAccountSeller(String id);
 }

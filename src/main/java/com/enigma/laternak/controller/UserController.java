@@ -13,10 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -60,6 +57,20 @@ public class UserController {
                 .data(result.getContent())
                 .message("Get all data successfully")
                 .pagingResponse(paging)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(
+            path = "/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<UserResponse>> deleteById(@PathVariable String id) {
+        userService.deleteAccountUser(id);
+
+        CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Unactivated account user successfully")
                 .build();
         return ResponseEntity.ok(response);
     }

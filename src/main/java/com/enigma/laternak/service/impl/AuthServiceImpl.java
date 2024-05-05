@@ -125,6 +125,7 @@ public class AuthServiceImpl implements AuthService {
                 .otp(otp)
                 .otpGenerateTime(LocalDateTime.now())
                 .isVerified(false)
+                .isActive(false)
                 .build();
         storeService.createStore(store);
 
@@ -203,6 +204,7 @@ public class AuthServiceImpl implements AuthService {
         Store store = storeService.getByEmail(email);
         if (store.getOtp().equals(otp) && Duration.between(store.getOtpGenerateTime(), LocalDateTime.now()).getSeconds() < 60) {
             store.setVerified(true);
+            store.setActive(true);
             storeService.updateStore(store);
             return "Email is verified, you can login now";
         } else {
