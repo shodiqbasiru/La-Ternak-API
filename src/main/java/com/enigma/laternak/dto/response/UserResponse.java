@@ -1,9 +1,6 @@
-package com.enigma.laternak.dto.request;
+package com.enigma.laternak.dto.response;
 
-import com.enigma.laternak.dto.response.AccountResponse;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -16,4 +13,5 @@ public class UserResponse {
     private String phoneNumber;
     private String address;
     private AccountResponse accountDetails;
+    private StoreResponse storeDetails;
 }
