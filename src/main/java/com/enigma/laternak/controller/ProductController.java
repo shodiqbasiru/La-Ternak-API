@@ -1,5 +1,6 @@
 package com.enigma.laternak.controller;
 
+import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.dto.request.ProductRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/products")
+@RequestMapping(path = ApiRoute.PRODUCT_API)
 public class ProductController {
     private final ProductService productService;
 
@@ -51,9 +52,9 @@ public class ProductController {
             @RequestParam(name="direction", defaultValue = "asc") String direction,
             @RequestParam(name="sortBy", defaultValue = "id") String sortBy,
             @RequestParam(name="productName", required = false) String productName,
-            @RequestParam(name="price", required = false) double price,
+            @RequestParam(name="price", required = false) Double price,
             @RequestParam(name="description", required = false) String description,
-            @RequestParam(name="stock", required = false) int stock
+            @RequestParam(name="stock", required = false) Integer stock
     ){
         SearchProductRequest searchRequest = SearchProductRequest.builder()
                 .direction(direction)
