@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ProductResponse {
+    private String id;
     private String productName;
     private Double price;
     private Integer stock;

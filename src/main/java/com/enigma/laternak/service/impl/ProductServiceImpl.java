@@ -10,18 +10,16 @@ import com.enigma.laternak.repository.ProductRepository;
 import com.enigma.laternak.repository.StoreRepository;
 import com.enigma.laternak.service.ProductService;
 import com.enigma.laternak.spesification.ProductSpesification;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.transaction.annotation.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +80,7 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductResponse convertProductToProductResponse(Product product){
         return ProductResponse.builder()
+                .id(product.getId())
                 .price(product.getPrice())
                 .productName(product.getProductName())
                 .stock(product.getStock())
