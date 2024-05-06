@@ -1,5 +1,6 @@
 package com.enigma.laternak.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,6 +35,7 @@ public class Account implements UserDetails {
     private List<Role> roles;
 
     @OneToOne(mappedBy = "account")
+    @JsonManagedReference
     private User user;
 
     @Override

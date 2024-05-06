@@ -1,5 +1,7 @@
 package com.enigma.laternak.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +27,7 @@ public class User {
     private String address;
 
     @OneToOne
+    @JsonBackReference
     @JoinColumn(name = "account_id", unique = true)
     private Account account;
 
@@ -33,5 +36,6 @@ public class User {
     private ImageUser imageUser;
 
     @OneToOne(mappedBy = "user")
+    @JsonManagedReference
     private Store store;
 }
