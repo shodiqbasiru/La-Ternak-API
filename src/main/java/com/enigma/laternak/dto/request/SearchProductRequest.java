@@ -13,7 +13,7 @@ public class SearchProductRequest {
     private String sortBy;
     private String direction;
     private String productName;
-    private Double price;
+    private Integer price;
     private Integer stock;
     private String description;
 }

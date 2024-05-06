@@ -18,7 +18,7 @@ public class UpdateProductRequest {
 
     @NotNull(message = "Price is Required")
     @Min(value = 0)
-    private Double price;
+    private Integer price;
 
     @NotNull(message = "Stock is Required")
     @Min(value = 0)

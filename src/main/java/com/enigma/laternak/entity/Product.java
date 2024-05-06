@@ -1,5 +1,6 @@
 package com.enigma.laternak.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +22,7 @@ public class Product {
     private String productName;
 
     @Column(name = "price", nullable = false)
-    private Double price;
+    private Integer price;
 
     @Column(name = "stock", nullable = false)
     private Integer stock;
@@ -30,6 +31,7 @@ public class Product {
     private String description;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 }

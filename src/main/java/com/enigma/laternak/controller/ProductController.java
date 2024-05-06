@@ -52,7 +52,7 @@ public class ProductController {
             @RequestParam(name="direction", defaultValue = "asc") String direction,
             @RequestParam(name="sortBy", defaultValue = "id") String sortBy,
             @RequestParam(name="productName", required = false) String productName,
-            @RequestParam(name="price", required = false) Double price,
+            @RequestParam(name="price", required = false) Integer price,
             @RequestParam(name="description", required = false) String description,
             @RequestParam(name="stock", required = false) Integer stock
     ){
