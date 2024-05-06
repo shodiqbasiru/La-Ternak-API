@@ -29,7 +29,7 @@ public class ImageProductServiceImpl implements ImageProductService {
     private final ProductRepository productRepository;
 
     @Autowired
-    public ImageProductServiceImpl(@Value("${wmb.multipart.path-location}") String directoryPath, ImageProductRepository imageProductRepository, ProductRepository productRepository) {
+    public ImageProductServiceImpl(@Value("${la_ternak.multipart.path-location}") String directoryPath, ImageProductRepository imageProductRepository, ProductRepository productRepository) {
         this.directoryPath = Paths.get(directoryPath);
         this.imageProductRepository = imageProductRepository;
         this.productRepository=productRepository;

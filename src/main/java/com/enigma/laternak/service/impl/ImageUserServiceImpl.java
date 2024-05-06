@@ -26,7 +26,7 @@ public class ImageUserServiceImpl implements ImageUserService {
     private final ImageUserRepository imageUserRepository;
 
     @Autowired
-    public ImageUserServiceImpl(@Value("${wmb.multipart.path-location}") String directoryPath, ImageUserRepository imageUserRepository) {
+    public ImageUserServiceImpl(@Value("${la_ternak.multipart.path-location}") String directoryPath, ImageUserRepository imageUserRepository) {
         this.directoryPath = Paths.get(directoryPath);
         this.imageUserRepository = imageUserRepository;
     }
