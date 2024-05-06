@@ -15,4 +15,5 @@ public class StoreResponse {
     private String email;
     private String address;
     private List<ProductResponse> productDetails;
+    private boolean isActive;
 }

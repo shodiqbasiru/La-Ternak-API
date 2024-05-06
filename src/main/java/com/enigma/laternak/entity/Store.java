@@ -27,7 +27,7 @@ public class Store {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "otp")
+    @Column(name = "otp", nullable = false, length = 6, unique = true)
     private String otp;
 
     @Column(name = "otp_generate_time")

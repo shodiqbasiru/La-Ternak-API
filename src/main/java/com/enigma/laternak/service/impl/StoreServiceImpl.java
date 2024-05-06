@@ -51,6 +51,7 @@ public class StoreServiceImpl implements StoreService {
                 .storeName(store.getStoreName())
                 .email(store.getEmail())
                 .address(store.getAddress())
+                .isActive(store.isActive())
                 .productDetails(store.getProducts() == null ? null : store.getProducts().stream().map(product -> ProductResponse.builder()
                         .id(product.getId())
                         .productName(product.getProductName())

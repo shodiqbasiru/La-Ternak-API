@@ -16,7 +16,9 @@ import com.enigma.laternak.util.ValidationUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -33,6 +36,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final AccountRepository accountRepository;
     private final RoleService roleService;
@@ -168,6 +172,9 @@ public class AuthServiceImpl implements AuthService {
         Authentication authenticate = authenticationManager.authenticate(authentication);
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         Account account = (Account) authenticate.getPrincipal();
+        if (!account.getIsEnable()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not active");
+        }
         String jwtToken = jwtService.generateToken(account);
         return LoginResponse.builder()
                 .username(account.getUsername())
@@ -186,9 +193,13 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         Account account = (Account) authenticate.getPrincipal();
         Store store = account.getUser().getStore();
-        if (!store.isVerified()) {
-            throw new RuntimeException("Your account is not verified");
+        if(!store.isActive() && !store.isVerified()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not active");
         }
+        /*if (!store.isVerified()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not verified");
+        }*/
+
         String jwtToken = jwtService.generateToken(account);
         return LoginSellerResponse.builder()
                 .username(account.getUsername())
