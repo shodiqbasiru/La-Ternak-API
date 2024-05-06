@@ -1,9 +1,13 @@
 package com.enigma.laternak.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -31,7 +35,7 @@ public class Store {
     private String otp;
 
     @Column(name = "otp_generate_time")
-    private LocalDateTime otpGenerateTime;
+    private Date otpGenerateTime;
 
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified;
@@ -40,9 +44,11 @@ public class Store {
     private boolean isActive;
 
     @OneToOne
+    @JsonBackReference
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "store")
     private List<Product> products;
 }

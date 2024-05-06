@@ -58,7 +58,20 @@ public class StoreController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
 
+    @GetMapping(
+            path = "/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<StoreResponse>> findById(@PathVariable String id) {
+        StoreResponse result = storeService.getById(id);
+        CommonResponse<StoreResponse> response = CommonResponse.<StoreResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get data successfully")
+                .data(result)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping(

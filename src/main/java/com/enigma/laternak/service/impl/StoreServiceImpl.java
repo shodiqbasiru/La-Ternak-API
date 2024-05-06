@@ -11,8 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,13 +31,28 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(readOnly = true)
     @Override
     public Store getByEmail(String email) {
-        return storeRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("email not found"));
+        return storeRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "email not found"));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Store getById(String id) {
-        return storeRepository.findById(id).orElseThrow(() -> new RuntimeException("store not found"));
+    public StoreResponse getById(String id) {
+        Store store = storeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "store not found"));
+        return StoreResponse.builder()
+                .id(store.getId())
+                .storeName(store.getStoreName())
+                .email(store.getEmail())
+                .address(store.getAddress())
+                .isActive(store.isActive())
+                .productDetails(store.getProducts() == null ? null : store.getProducts().stream().map(product -> ProductResponse.builder()
+                        .id(product.getId())
+                        .productName(product.getProductName())
+                        .price(product.getPrice())
+                        .stock(product.getStock())
+                        .description(product.getDescription())
+                        .storeId(product.getStore().getId())
+                        .build()).toList())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -72,7 +89,7 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteAccountSeller(String id) {
-        Store currentStore = getById(id);
+        Store currentStore = storeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Store Not Found"));
         currentStore.setVerified(false);
         currentStore.setActive(false);
     }
