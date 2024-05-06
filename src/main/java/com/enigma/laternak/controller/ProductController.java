@@ -8,6 +8,9 @@ import com.enigma.laternak.dto.response.CommonResponse;
 import com.enigma.laternak.dto.response.PagingResponse;
 import com.enigma.laternak.dto.response.ProductResponse;
 import com.enigma.laternak.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,9 +23,15 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = ApiRoute.PRODUCT_API)
+@Tag(name = "Product", description = "Api for product")
 public class ProductController {
     private final ProductService productService;
 
+    @Operation(
+            summary = "Create Product",
+            description = "Create a new product"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<ProductResponse>> create(@RequestBody ProductRequest request){
@@ -33,7 +42,13 @@ public class ProductController {
                 .statusCode(HttpStatus.CREATED.value())
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
-    };
+    }
+
+    @Operation(
+            summary = "Update Product",
+            description = "Update product"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<String>> update(@RequestBody UpdateProductRequest request){
@@ -44,7 +59,13 @@ public class ProductController {
                 .statusCode(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-    };
+    }
+
+    @Operation(
+            summary = "Get All",
+            description = "Get all product"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<ProductResponse>>> findAll(
             @RequestParam(name="page", defaultValue = "1") Integer page,
@@ -82,7 +103,13 @@ public class ProductController {
                 .pagingResponse(pagingResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-    };
+    }
+
+    @Operation(
+            summary = "Delete Product",
+            description = "Delete product by id"
+    )
+    @SecurityRequirement(name = "Authorization")
     @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<String>> deleteById(@PathVariable String id){
         productService.deleteById(id);

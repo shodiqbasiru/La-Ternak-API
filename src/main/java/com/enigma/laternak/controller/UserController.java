@@ -8,6 +8,9 @@ import com.enigma.laternak.dto.response.PagingResponse;
 import com.enigma.laternak.dto.response.UserResponse;
 import com.enigma.laternak.entity.User;
 import com.enigma.laternak.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,10 +23,16 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = ApiRoute.USER_API)
+@Tag(name = "User", description = "API for user")
 public class UserController {
 
     private final UserService userService;
 
+    @Operation(
+            summary = "Get All",
+            description = "Get all user"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -61,6 +70,11 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Get User",
+            description = "Get user by id"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -75,6 +89,11 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Update User",
+            description = "Update user"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PutMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -94,6 +113,11 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Delete User",
+            description = "Delete user by id"
+    )
+    @SecurityRequirement(name = "Authorization")
     @DeleteMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE

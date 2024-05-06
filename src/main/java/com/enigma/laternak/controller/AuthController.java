@@ -7,6 +7,9 @@ import com.enigma.laternak.dto.request.RegisterSellerRequest;
 import com.enigma.laternak.dto.response.*;
 import com.enigma.laternak.service.AuthService;
 import com.enigma.laternak.dto.request.LoginSellerRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,9 +19,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ApiRoute.AUTH_API)
+@Tag(name = "Auth", description = "Auth APi")
 public class AuthController {
     private final AuthService authService;
 
+    @Operation(
+            summary = "Register new user",
+            description = "Register new user"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PostMapping(
             path = "/register",
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -34,6 +43,11 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Register new user as seller",
+            description = "Register new user as seller"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PostMapping(
             path = "/register-seller",
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -49,6 +63,11 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Login",
+            description = "Login"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PostMapping(
             path = "/login",
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -64,6 +83,11 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Login Seller",
+            description = "Login Seller"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PostMapping(
             path = "/login-seller",
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -79,6 +103,11 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Verify account seller",
+            description = "Verify account seller"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             path = "/verify-account-seller"
     )
@@ -95,6 +124,11 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Regenerate OTP",
+            description = "Regenerate OTP"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             path = "/regenerate-otp"
     )

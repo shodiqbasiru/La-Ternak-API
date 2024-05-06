@@ -6,6 +6,9 @@ import com.enigma.laternak.dto.response.CommonResponse;
 import com.enigma.laternak.dto.response.PagingResponse;
 import com.enigma.laternak.dto.response.StoreResponse;
 import com.enigma.laternak.service.StoreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,10 +21,16 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = ApiRoute.STORE_API)
+@Tag(name = "Store", description = "Api for store")
 public class StoreController {
 
     private final StoreService storeService;
 
+    @Operation(
+            summary = "get all store",
+            description = "get all store"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -60,6 +69,11 @@ public class StoreController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Get Store",
+            description = "Get store by id"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -74,6 +88,11 @@ public class StoreController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Delete Store",
+            description = "Delete store by id"
+    )
+    @SecurityRequirement(name = "Authorization")
     @DeleteMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE

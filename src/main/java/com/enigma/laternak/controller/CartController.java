@@ -6,6 +6,9 @@ import com.enigma.laternak.dto.response.CartResponse;
 import com.enigma.laternak.dto.response.CommonResponse;
 import com.enigma.laternak.entity.Cart;
 import com.enigma.laternak.service.CartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,10 +20,16 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = ApiRoute.CART_API)
+@Tag(name = "Cart", description = "Cart API")
 public class CartController {
 
     private final CartService cartService;
 
+    @Operation(
+            summary = "Add To Cart",
+            description = "Add Product To Cart"
+    )
+    @SecurityRequirement(name = "Authorization")
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -38,6 +47,11 @@ public class CartController {
                 .build());
     }
 
+    @Operation(
+            summary = "Get All Cart",
+            description = "Get All Cart"
+    )
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -50,6 +64,11 @@ public class CartController {
                 .build());
     }
 
+    @Operation(
+            summary = "Delete Cart",
+            description = "Delete Product In Cart"
+    )
+    @SecurityRequirement(name = "Authorization")
     @DeleteMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
