@@ -6,4 +6,6 @@ public class ApiRoute {
     public static final String STORE_API = "/api/stores";
     public static final String PRODUCT_API = "/api/products";
     public static final String CART_API = "/api/carts";
+    public static final String IMAGE_USER_API="/api/imageUsers";
+    public static final String IMAGE_PRODUCT_API="/api/imageProducts";
 }
