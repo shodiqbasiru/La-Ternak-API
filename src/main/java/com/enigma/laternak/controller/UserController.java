@@ -2,11 +2,11 @@ package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.dto.request.PaginationUserRequest;
+import com.enigma.laternak.dto.request.UpdateUserRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
 import com.enigma.laternak.dto.response.PagingResponse;
 import com.enigma.laternak.dto.response.UserResponse;
 import com.enigma.laternak.entity.User;
-import com.enigma.laternak.repository.UserRepository;
 import com.enigma.laternak.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -57,6 +57,39 @@ public class UserController {
                 .data(result.getContent())
                 .message("Get all data successfully")
                 .pagingResponse(paging)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(
+            path = "/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<User>> findById(@PathVariable String id) {
+        User result = userService.getById(id);
+        CommonResponse<User> response = CommonResponse.<User>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get data successfully")
+                .data(result)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<UserResponse>> update(@RequestBody UpdateUserRequest request) {
+        User result = userService.update(request);
+        CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Update data successfully")
+                .data(UserResponse.builder()
+                        .id(result.getId())
+                        .customerName(result.getCustomerName())
+                        .phoneNumber(result.getPhoneNumber())
+                        .address(result.getAddress())
+                        .build())
                 .build();
         return ResponseEntity.ok(response);
     }

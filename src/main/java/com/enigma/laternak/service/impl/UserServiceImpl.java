@@ -1,6 +1,7 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.dto.request.PaginationUserRequest;
+import com.enigma.laternak.dto.request.UpdateUserRequest;
 import com.enigma.laternak.dto.response.AccountResponse;
 import com.enigma.laternak.dto.response.StoreResponse;
 import com.enigma.laternak.dto.response.UserResponse;
@@ -59,6 +60,15 @@ public class UserServiceImpl implements UserService {
                         .address(user.getStore().getAddress())
                         .build())
                 .build());
+    }
+
+    @Override
+    public User update(UpdateUserRequest user) {
+        User currentUser = getById(user.getId());
+        currentUser.setCustomerName(user.getCustomerName());
+        currentUser.setPhoneNumber(user.getPhoneNumber());
+        currentUser.setAddress(user.getAddress());
+        return userRepository.saveAndFlush(currentUser);
     }
 
     @Override

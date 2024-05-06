@@ -17,4 +17,9 @@ public class UpdateUserRequest {
     @Size(min = 3, max = 50)
     private String customerName;
 
+    @NotBlank(message = "phone number is required")
+    @Size(min = 3, max = 15)
+    private String phoneNumber;
+
+    private String address;
 }
