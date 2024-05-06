@@ -4,7 +4,9 @@ import com.enigma.laternak.dto.request.ProductRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
 import com.enigma.laternak.dto.response.ProductResponse;
+import com.enigma.laternak.dto.response.ReviewResponse;
 import com.enigma.laternak.entity.Product;
+import com.enigma.laternak.entity.Review;
 import com.enigma.laternak.entity.Store;
 import com.enigma.laternak.repository.ProductRepository;
 import com.enigma.laternak.repository.StoreRepository;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -30,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ProductResponse create(ProductRequest request) {
-        Store store=storeRepository.findById(request.getStoreId()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
+        Store store = storeRepository.findById(request.getStoreId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
         Product product = Product.builder()
                 .price(request.getPrice())
                 .productName(request.getProductName())
@@ -43,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Product findById(String id) {
-        return productRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is not found"));
+        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is not found"));
     }
 
     @Override
@@ -55,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ProductResponse update(UpdateProductRequest product) {
-        Product currentProduct=findById(product.getId());
+        Product currentProduct = findById(product.getId());
         currentProduct.setProductName(product.getProductName());
         currentProduct.setDescription(product.getDescription());
         currentProduct.setStock(product.getStock());
@@ -72,13 +76,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> findAll(SearchProductRequest request) {
         if (request.getPage() <= 0) request.setPage(1);
-        Specification<Product> specification= ProductSpesification.getSpesification(request);
-        Sort sort=Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy());
-        Pageable pageable= PageRequest.of(request.getPage()-1, request.getSize(), sort);
+        Specification<Product> specification = ProductSpesification.getSpesification(request);
+        Sort sort = Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy());
+        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(), sort);
         return productRepository.findAll(specification, pageable).map(this::convertProductToProductResponse);
     }
 
-    private ProductResponse convertProductToProductResponse(Product product){
+    private ProductResponse convertProductToProductResponse(Product product) {
+        List<Review> reviews = product.getReviews();
+        List<ReviewResponse> reviewResponses = reviews.stream().map(review -> ReviewResponse.builder()
+                .id(review.getId())
+                .rating(review.getRating())
+                .comment(review.getComment())
+                .userId(review.getUser().getId())
+                .productId(review.getProduct().getId())
+                .build()).toList();
         return ProductResponse.builder()
                 .id(product.getId())
                 .price(product.getPrice())
@@ -86,6 +98,7 @@ public class ProductServiceImpl implements ProductService {
                 .stock(product.getStock())
                 .description(product.getDescription())
                 .storeId(product.getStore().getId())
+                .reviews(reviewResponses)
                 .build();
     }
 }

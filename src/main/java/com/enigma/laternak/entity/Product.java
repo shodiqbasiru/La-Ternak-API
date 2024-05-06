@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Setter
 @Getter
@@ -34,4 +35,8 @@ public class Product {
     @JsonBackReference
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "product")
+    private List<Review> reviews;
 }

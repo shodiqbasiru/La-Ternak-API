@@ -2,6 +2,8 @@ package com.enigma.laternak.dto.response;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,5 @@ public class ProductResponse {
     private Integer stock;
     private String description;
     private String storeId;
+    private List<ReviewResponse> reviews;
 }

@@ -51,4 +51,5 @@ public class Store {
     @JsonManagedReference
     @OneToMany(mappedBy = "store")
     private List<Product> products;
+
 }
