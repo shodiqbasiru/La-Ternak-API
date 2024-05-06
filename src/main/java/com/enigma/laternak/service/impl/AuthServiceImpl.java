@@ -30,7 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,7 +130,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .user(user)
                 .otp(otp)
-                .otpGenerateTime(LocalDateTime.now())
+                .otpGenerateTime(new Date())
                 .isVerified(false)
                 .isActive(false)
                 .build();
@@ -183,6 +186,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public LoginSellerResponse loginSeller(LoginRequest request) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -213,16 +217,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String verifyAccountSeller(String email, String otp) {
         Store store = storeService.getByEmail(email);
-        if (store.getOtp().equals(otp) && Duration.between(store.getOtpGenerateTime(), LocalDateTime.now()).getSeconds() < 60) {
+        if (store.getOtp().equals(otp) && Duration.between((Temporal) store.getOtpGenerateTime(), LocalDateTime.now()).getSeconds() < 60) {
             store.setVerified(true);
             store.setActive(true);
-            storeService.updateStore(store);
             return "Email is verified, you can login now";
         } else {
             return "Please regenerate otp and try again";
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public String regenerateOtp(String email) {
         Store store = storeService.getByEmail(email);
@@ -247,8 +251,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         store.setOtp(otp);
-        store.setOtpGenerateTime(LocalDateTime.now());
-        storeService.updateStore(store);
+        store.setOtpGenerateTime(new Date());
 
         return "Otp has been sent to your email, please verify account within 1 minute";
     }
