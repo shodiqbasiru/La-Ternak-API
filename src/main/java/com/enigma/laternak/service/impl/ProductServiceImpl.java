@@ -1,17 +1,22 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.dto.request.ProductRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
+import com.enigma.laternak.dto.response.ImageProductResponse;
 import com.enigma.laternak.dto.response.ProductResponse;
 import com.enigma.laternak.dto.response.ReviewResponse;
+import com.enigma.laternak.entity.ImageProduct;
 import com.enigma.laternak.entity.Product;
 import com.enigma.laternak.entity.Review;
 import com.enigma.laternak.entity.Store;
 import com.enigma.laternak.repository.ProductRepository;
 import com.enigma.laternak.repository.StoreRepository;
+import com.enigma.laternak.service.ImageProductService;
 import com.enigma.laternak.service.ProductService;
 import com.enigma.laternak.spesification.ProductSpesification;
+import com.enigma.laternak.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,18 +35,33 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
+    private final ValidationUtil validationUtil;
+    private final ImageProductService imageProductService;
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public ProductResponse create(ProductRequest request) {
+        validationUtil.validate(request);
+
         Store store = storeRepository.findById(request.getStoreId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
         Product product = Product.builder()
-                .price(request.getPrice())
                 .productName(request.getProductName())
-                .stock(request.getStock())
                 .description(request.getDescription())
-                .store(store).build();
-        return convertProductToProductResponse(productRepository.saveAndFlush(product));
+                .stock(request.getStock())
+                .price(request.getPrice())
+                .store(store)
+                .isActive(true)
+                .build();
+
+
+        if (request.getImages() != null) {
+            List<ImageProduct> imageProduct = imageProductService.create(request.getImages(), product);
+            product.setImages(imageProduct);
+        } else {
+            productRepository.saveAndFlush(product);
+        }
+
+        return convertProductToProductResponse(product);
     }
 
     @Override
@@ -58,19 +78,30 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ProductResponse update(UpdateProductRequest product) {
-        Product currentProduct = findById(product.getId());
-        currentProduct.setProductName(product.getProductName());
-        currentProduct.setDescription(product.getDescription());
-        currentProduct.setStock(product.getStock());
-        currentProduct.setPrice(product.getPrice());
-        return convertProductToProductResponse(productRepository.saveAndFlush(currentProduct));
+    public ProductResponse update(UpdateProductRequest request) {
+        Product currentProduct = findById(request.getId());
+        List<ImageProduct> imageProducts = currentProduct.getImages();
+
+        currentProduct.setProductName(request.getProductName());
+        currentProduct.setDescription(request.getDescription());
+        currentProduct.setStock(request.getStock());
+        currentProduct.setPrice(request.getPrice());
+        if (request.getImages() != null) {
+            imageProducts.forEach(imageProduct -> imageProductService.deleteById(imageProduct.getId()));
+            List<ImageProduct> imageProduct = imageProductService.create(request.getImages(), currentProduct);
+            currentProduct.setImages(imageProduct);
+        } else {
+            productRepository.saveAndFlush(currentProduct);
+        }
+
+        return convertProductToProductResponse(currentProduct);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteById(String id) {
-        productRepository.deleteById(id);
+        Product currentProduct = findById(id);
+        currentProduct.setIsActive(false);
     }
 
     @Override
@@ -82,8 +113,17 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll(specification, pageable).map(this::convertProductToProductResponse);
     }
 
+    @Override
+    public List<ProductResponse> findAll() {
+        return productRepository.findAll().stream().map(this::convertProductToProductResponse).toList();
+    }
+
     private ProductResponse convertProductToProductResponse(Product product) {
-        List<Review> reviews = product.getReviews();
+        List<Review> reviews = product.getReviews() !=null ? product.getReviews() : List.of();
+        List<ImageProductResponse> imageProductResponses = product.getImages().stream().map(imageProduct -> ImageProductResponse.builder()
+                .url(ApiRoute.IMAGE_PRODUCT_API + "/" + imageProduct.getId())
+                .name(imageProduct.getName())
+                .build()).toList();
         List<ReviewResponse> reviewResponses = reviews.stream().map(review -> ReviewResponse.builder()
                 .id(review.getId())
                 .rating(review.getRating())
@@ -99,6 +139,7 @@ public class ProductServiceImpl implements ProductService {
                 .description(product.getDescription())
                 .storeId(product.getStore().getId())
                 .reviews(reviewResponses)
+                .images(imageProductResponses)
                 .build();
     }
 }

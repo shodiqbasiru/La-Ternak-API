@@ -31,6 +31,9 @@ public class Product {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "store_id", nullable = false)
@@ -39,4 +42,8 @@ public class Product {
     @JsonBackReference
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "product")
+    private List<ImageProduct> images;
 }

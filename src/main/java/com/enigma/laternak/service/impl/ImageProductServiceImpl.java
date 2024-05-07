@@ -1,4 +1,5 @@
 package com.enigma.laternak.service.impl;
+
 import com.enigma.laternak.entity.ImageProduct;
 import com.enigma.laternak.entity.Product;
 import com.enigma.laternak.repository.ImageProductRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,21 +28,19 @@ import java.util.List;
 public class ImageProductServiceImpl implements ImageProductService {
     private final Path directoryPath;
     private final ImageProductRepository imageProductRepository;
-    private final ProductRepository productRepository;
 
     @Autowired
-    public ImageProductServiceImpl(@Value("${la_ternak.multipart.path-location}") String directoryPath, ImageProductRepository imageProductRepository, ProductRepository productRepository) {
+    public ImageProductServiceImpl(@Value("${la_ternak.multipart.path-location-image-product}") String directoryPath, ImageProductRepository imageProductRepository) {
         this.directoryPath = Paths.get(directoryPath);
         this.imageProductRepository = imageProductRepository;
-        this.productRepository=productRepository;
     }
 
     @PostConstruct
-    public void iniDirectory(){
-        if (!Files.exists(directoryPath)){
-            try{
+    public void iniDirectory() {
+        if (!Files.exists(directoryPath)) {
+            try {
                 Files.createDirectory(directoryPath);
-            }catch (IOException e){
+            } catch (IOException e) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
             }
         }
@@ -48,39 +48,41 @@ public class ImageProductServiceImpl implements ImageProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ImageProduct create(MultipartFile multipartFile, String idProduct) {
-        try{
-            if(!List.of("image/jpeg", "image/png", "image/jpg").contains(multipartFile.getContentType())){
-                throw new ConstraintViolationException("Type data is false", null);
-            }
-            Product product=productRepository.findById(idProduct).orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is not found"));
-            String uniqueFileName=System.currentTimeMillis()+"_"+multipartFile.getOriginalFilename();
-            Path filePath=directoryPath.resolve(uniqueFileName);
-            Files.copy(multipartFile.getInputStream(), filePath);
-            ImageProduct image=ImageProduct.builder()
-                    .name(multipartFile.getOriginalFilename())
-                    .contentType(multipartFile.getContentType())
-                    .size(multipartFile.getSize())
-                    .path(filePath.toString())
-                    .product(product)
-                    .build();
-            imageProductRepository.saveAndFlush(image);
-            return image;
-        }catch (IOException e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public List<ImageProduct> create(List<MultipartFile> multipartFiles, Product product) {
+        List<ImageProduct> images = multipartFiles.stream().map(file -> {
+            try {
+                if (!List.of("image/jpeg", "image/png", "image/jpg").contains(file.getContentType())) {
+                    throw new ConstraintViolationException("file must be image", null);
+                }
 
+                String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                Path path = directoryPath.resolve(filename);
+                Files.copy(file.getInputStream(), path);
+
+                ImageProduct imageProduct = ImageProduct.builder()
+                        .name(filename)
+                        .path(path.toString())
+                        .size(file.getSize())
+                        .contentType(file.getContentType())
+                        .product(product)
+                        .build();
+                return imageProductRepository.saveAndFlush(imageProduct);
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            }
+        }).toList();
+        return images;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Resource getById(String id) {
-        try{
-            ImageProduct image=imageProductRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "file not found"));
-            Path path=Paths.get(image.getPath());
+        try {
+            ImageProduct image = imageProductRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "file not found"));
+            Path path = Paths.get(image.getPath());
             if (!Files.exists(path)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "file not found");
             return new UrlResource(path.toUri());
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

@@ -17,4 +17,5 @@ public class ProductResponse {
     private String description;
     private String storeId;
     private List<ReviewResponse> reviews;
+    private List<ImageProductResponse> images;
 }

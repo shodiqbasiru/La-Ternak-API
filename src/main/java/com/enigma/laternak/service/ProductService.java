@@ -7,6 +7,8 @@ import com.enigma.laternak.dto.response.ProductResponse;
 import com.enigma.laternak.entity.Product;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface ProductService {
     ProductResponse create(ProductRequest request);
     Product findById(String id);
@@ -14,4 +16,5 @@ public interface ProductService {
     ProductResponse update(UpdateProductRequest product);
     void deleteById(String id);
     Page<ProductResponse> findAll(SearchProductRequest request);
+    List<ProductResponse> findAll();
 }
