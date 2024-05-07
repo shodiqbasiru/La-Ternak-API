@@ -35,7 +35,7 @@ public class Store {
     private String otp;
 
     @Column(name = "otp_generate_time")
-    private Date otpGenerateTime;
+    private LocalDateTime otpGenerateTime;
 
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified;

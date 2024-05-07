@@ -28,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -130,7 +131,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .user(user)
                 .otp(otp)
-                .otpGenerateTime(new Date())
+                .otpGenerateTime(LocalDateTime.now())
                 .isVerified(false)
                 .isActive(false)
                 .build();
@@ -217,12 +218,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String verifyAccountSeller(String email, String otp) {
         Store store = storeService.getByEmail(email);
-        if (store.getOtp().equals(otp) && Duration.between((Temporal) store.getOtpGenerateTime(), LocalDateTime.now()).getSeconds() < 60) {
+        if (store.getOtp().equals(otp) && Duration.between(store.getOtpGenerateTime(), LocalDateTime.now()).getSeconds() < 60) {
             store.setVerified(true);
             store.setActive(true);
-            return "Email is verified, you can login now";
+            return "Your account has been verified";
         } else {
-            return "Please regenerate otp and try again";
+            return "Your account is not verified";
         }
     }
 
@@ -251,7 +252,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         store.setOtp(otp);
-        store.setOtpGenerateTime(new Date());
+        store.setOtpGenerateTime(LocalDateTime.now());
 
         return "Otp has been sent to your email, please verify account within 1 minute";
     }

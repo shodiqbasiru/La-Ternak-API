@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequiredArgsConstructor
@@ -111,17 +112,12 @@ public class AuthController {
     @GetMapping(
             path = "/verify-account-seller"
     )
-    public ResponseEntity<CommonResponse<?>> verifyAccount(
+    public RedirectView verifyAccount(
             @RequestParam(name = "email") String email,
             @RequestParam(name = "otp") String otp
     ) {
-        String verifyAccount = authService.verifyAccountSeller(email, otp);
-        CommonResponse<?> response = CommonResponse.builder()
-                .statusCode(HttpStatus.OK.value())
-                .data(verifyAccount)
-                .message(null)
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        authService.verifyAccountSeller(email, otp);
+        return new RedirectView("http://10.10.102.94:5173/verification");
     }
 
     @Operation(
