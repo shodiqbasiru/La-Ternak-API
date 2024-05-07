@@ -221,6 +221,7 @@ public class AuthServiceImpl implements AuthService {
         if (store.getOtp().equals(otp) && Duration.between(store.getOtpGenerateTime(), LocalDateTime.now()).getSeconds() < 60) {
             store.setVerified(true);
             store.setActive(true);
+            storeService.updateStore(store);
             return "Your account has been verified";
         } else {
             return "Your account is not verified";

@@ -1,9 +1,11 @@
 package com.enigma.laternak.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -11,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "m_order")
+@Table(name = "t_order")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,4 +30,8 @@ public class Order {
     @OneToOne
     @JoinColumn(name = "payment_id", unique = true)
     private Payment payment;
+
+    @OneToMany(mappedBy = "order")
+    @JsonManagedReference
+    private List<OrderDetail> orderDetails;
 }

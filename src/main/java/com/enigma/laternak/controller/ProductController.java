@@ -93,23 +93,23 @@ public class ProductController {
         }
     }
 
-    @Operation(
-            summary = "Get All",
-            description = "Get all product"
-    )
-    @SecurityRequirement(name = "Authorization")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CommonResponse<List<ProductResponse>>> findAll() {
-        List<ProductResponse> listProduct = productService.findAll();
-        CommonResponse<List<ProductResponse>> commonResponse = CommonResponse.<List<ProductResponse>>builder()
-                .data(listProduct)
-                .message("Successfully get data")
-                .statusCode(HttpStatus.OK.value())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-    }
+//    @Operation(
+//            summary = "Get All",
+//            description = "Get all product"
+//    )
+//    @SecurityRequirement(name = "Authorization")
+//    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<CommonResponse<List<ProductResponse>>> findAll() {
+//        List<ProductResponse> listProduct = productService.findAll();
+//        CommonResponse<List<ProductResponse>> commonResponse = CommonResponse.<List<ProductResponse>>builder()
+//                .data(listProduct)
+//                .message("Successfully get data")
+//                .statusCode(HttpStatus.OK.value())
+//                .build();
+//        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+//    }
 
-   /* @Operation(
+    @Operation(
             summary = "Get All",
             description = "Get all product"
     )
@@ -139,7 +139,6 @@ public class ProductController {
         PagingResponse pagingResponse = PagingResponse.builder()
                 .page(listProduct.getTotalPages() + 1)
                 .size(listProduct.getSize())
-//                .size((int) listProduct.getTotalElements())
                 .hasPrevious(listProduct.hasPrevious())
                 .hasNext(listProduct.hasNext())
                 .totalElement(listProduct.getTotalElements())
@@ -152,7 +151,7 @@ public class ProductController {
                 .pagingResponse(pagingResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-    }*/
+    }
 
     @Operation(
             summary = "Delete Product",

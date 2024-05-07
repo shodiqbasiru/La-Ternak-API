@@ -9,4 +9,5 @@ public class ApiRoute {
     public static final String REVIEW_API = "/api/reviews";
     public static final String IMAGE_PRODUCT_API = "/api/images/product";
     public static final String IMAGE_USER_API = "/api/images/user";
+    public static final String ORDER_API = "/api/orders";
 }

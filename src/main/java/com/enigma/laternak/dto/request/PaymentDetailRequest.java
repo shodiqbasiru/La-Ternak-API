@@ -13,5 +13,5 @@ public class PaymentDetailRequest {
     private String orderId;
 
     @JsonProperty("gross_amount")
-    private Long amount;
+    private int amount;
 }

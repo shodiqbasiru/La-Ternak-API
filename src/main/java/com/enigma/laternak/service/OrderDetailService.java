@@ -4,6 +4,6 @@ import com.enigma.laternak.entity.OrderDetail;
 
 import java.util.List;
 
-public interface OrderServiceDetail {
+public interface OrderDetailService {
     List<OrderDetail> createBulk(List<OrderDetail> orderDetails);
 }
