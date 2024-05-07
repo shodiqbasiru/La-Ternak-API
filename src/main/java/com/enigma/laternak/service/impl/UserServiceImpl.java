@@ -11,11 +11,13 @@ import com.enigma.laternak.repository.UserRepository;
 import com.enigma.laternak.service.AuthService;
 import com.enigma.laternak.service.UserService;
 import com.enigma.laternak.service.UserServiceDetail;
+import com.enigma.laternak.spesification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -40,10 +42,11 @@ public class UserServiceImpl implements UserService {
     public Page<UserResponse> getAll(PaginationUserRequest request) {
         if (request.getPage() <= 0) request.setPage(1);
 
+        Specification<User> specification = UserSpecification.getSpecification(request);
         Sort sort = Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy());
         Pageable pageable = PageRequest.of((request.getPage() - 1), request.getSize(), sort);
 
-        return userRepository.findAll(pageable).map(user -> UserResponse.builder()
+        return userRepository.findAll(specification,pageable).map(user -> UserResponse.builder()
                 .id(user.getId())
                 .customerName(user.getCustomerName())
                 .phoneNumber(user.getPhoneNumber())
