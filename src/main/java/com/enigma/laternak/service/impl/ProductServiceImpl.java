@@ -15,7 +15,7 @@ import com.enigma.laternak.repository.ProductRepository;
 import com.enigma.laternak.repository.StoreRepository;
 import com.enigma.laternak.service.ImageProductService;
 import com.enigma.laternak.service.ProductService;
-import com.enigma.laternak.spesification.ProductSpesification;
+import com.enigma.laternak.spesification.ProductSpecification;
 import com.enigma.laternak.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -107,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> findAll(SearchProductRequest request) {
         if (request.getPage() <= 0) request.setPage(1);
-        Specification<Product> specification = ProductSpesification.getSpesification(request);
+        Specification<Product> specification = ProductSpecification.getSpecification(request);
         Sort sort = Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy());
         Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize(), sort);
         return productRepository.findAll(specification, pageable).map(this::convertProductToProductResponse);
@@ -119,11 +119,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ProductResponse convertProductToProductResponse(Product product) {
-        List<Review> reviews = product.getReviews() !=null ? product.getReviews() : List.of();
-        List<ImageProductResponse> imageProductResponses = product.getImages().stream().map(imageProduct -> ImageProductResponse.builder()
-                .url(ApiRoute.IMAGE_PRODUCT_API + "/" + imageProduct.getId())
-                .name(imageProduct.getName())
-                .build()).toList();
+        List<Review> reviews = product.getReviews() != null ? product.getReviews() : List.of();
+        List<ImageProductResponse> imageProductResponses = product.getImages().stream()
+                .map(imageProduct -> ImageProductResponse.builder()
+                        .url(ApiRoute.IMAGE_PRODUCT_API + "/" + imageProduct.getId())
+                        .name(imageProduct.getName())
+                        .build())
+                .toList();
         List<ReviewResponse> reviewResponses = reviews.stream().map(review -> ReviewResponse.builder()
                 .id(review.getId())
                 .rating(review.getRating())

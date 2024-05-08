@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(path = ApiRoute.IMAGE_PRODUCT_API)
 @Tag(name = "Image Product", description = "API for Image Product")
 public class ImageProductController {
     private final ImageProductService imageService;
@@ -25,11 +24,10 @@ public class ImageProductController {
             summary = "Download image product",
             description = "Download image product"
     )
-    @GetMapping("/{imageId}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable(name="imageId") String id){
-        Resource resource=imageService.getById(id);
-        String headerValue=String.format("attachment; filename%s",
-                resource.getFilename());
+    @GetMapping(path = ApiRoute.IMAGE_PRODUCT_API+"/{imageId}")
+    public ResponseEntity<?> downloadImage(@PathVariable String imageId){
+        Resource resource=imageService.getById(imageId);
+        String headerValue = String.format("attachment; filename=%s", resource.getFilename());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)

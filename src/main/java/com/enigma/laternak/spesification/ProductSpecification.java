@@ -8,12 +8,12 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductSpesification {
-    public static Specification<Product> getSpesification(SearchProductRequest request){
+public class ProductSpecification {
+    public static Specification<Product> getSpecification(SearchProductRequest request){
         return (root, query, cb) -> {
             List<Predicate> predicates=new ArrayList<>();
             if (request.getProductName()!=null){
-                Predicate predicate=cb.like(cb.lower(root.get("product_name")), "%"+request.getProductName().toLowerCase()+"%");
+                Predicate predicate=cb.like(cb.lower(root.get("productName")), "%"+request.getProductName().toLowerCase()+"%");
                 predicates.add(predicate);
             }
             if (request.getPrice() != null){
