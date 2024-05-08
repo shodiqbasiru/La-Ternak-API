@@ -15,36 +15,24 @@ public class OrderSpecification {
     public static Specification<Order> getSpecification(PaginationOrderRequest request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (request.getStartDate() != null) {
+
+            if (request.getStartDate() != null && request.getEndDate() != null) {
                 Date startDate = DateUtil.parseDate(request.getStartDate(), "yyyy-MM-dd");
-                Date getTime = new Timestamp(startDate.getTime() + 86400000);
-                predicates.add(criteriaBuilder.between(
-                        root.get("orderDate"),
-                        startDate,
-                        getTime
-                ));
+                Date endDate = DateUtil.parseDate(request.getEndDate(), "yyyy-MM-dd");
+                Predicate period = criteriaBuilder.between(root.get("orderDate"), startDate, new Timestamp(endDate.getTime() + 86400000));
+                predicates.add(period);
+            }
+            else if (request.getStartDate() != null) {
+                Date startDate = DateUtil.parseDate(request.getStartDate(), "yyyy-MM-dd");
+                Predicate periodGreater = criteriaBuilder.greaterThan(root.get("orderDate"),startDate);
+                predicates.add(periodGreater);
+            }
+            else if (request.getEndDate() != null) {
+                Date endDate = DateUtil.parseDate(request.getEndDate(), "yyyy-MM-dd");
+                Predicate periodLess = criteriaBuilder.lessThan(root.get("orderDate"), endDate);
+                predicates.add(periodLess);
             }
 
-            if (request.getStartDate() != null || request.getEndDate() != null) {
-
-
-                if (request.getStartDate() != null && request.getEndDate() != null) {
-                    Date startDate = DateUtil.parseDate(request.getStartDate(), "yyyy-MM-dd");
-                    Date endDate = DateUtil.parseDate(request.getEndDate(), "yyyy-MM-dd");
-                    Predicate period = criteriaBuilder.between(root.get("orderDate"), startDate, new Timestamp(endDate.getTime() + 86400000));
-                    predicates.add(period);
-                }
-                else if (request.getStartDate() != null) {
-                    Date startDate = DateUtil.parseDate(request.getStartDate(), "yyyy-MM-dd");
-                    Predicate periodGreater = criteriaBuilder.greaterThan(root.get("orderDate"),startDate);
-                    predicates.add(periodGreater);
-                }
-                else {
-                    Date endDate = DateUtil.parseDate(request.getEndDate(), "yyyy-MM-dd");
-                    Predicate periodLess = criteriaBuilder.lessThan(root.get("orderDate"), endDate);
-                    predicates.add(periodLess);
-                }
-            }
 
 
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
