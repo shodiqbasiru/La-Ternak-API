@@ -15,7 +15,7 @@ public class OrderResponse {
     private String id;
     private String userId;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date date;
+    private Date orderDate;
     private List<OrderDetailResponse> orderDetails;
     private PaymentResponse paymentResponse;
 }

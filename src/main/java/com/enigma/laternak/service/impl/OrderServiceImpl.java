@@ -1,13 +1,20 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.dto.request.OrderRequest;
+import com.enigma.laternak.dto.request.PaginationOrderRequest;
 import com.enigma.laternak.dto.response.OrderDetailResponse;
 import com.enigma.laternak.dto.response.OrderResponse;
 import com.enigma.laternak.dto.response.PaymentResponse;
 import com.enigma.laternak.entity.*;
 import com.enigma.laternak.repository.OrderRepository;
 import com.enigma.laternak.service.*;
+import com.enigma.laternak.spesification.OrderSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +47,8 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> orderDetails = request.getOrderDetailRequests().stream()
                 .map(detailRequest -> {
                     Product product = productService.findById(detailRequest.getProductId());
-                    if (product.getStock() - detailRequest.getQty() < 0) throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Out of stock");
+                    if (product.getStock() - detailRequest.getQty() < 0)
+                        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Out of stock");
 
                     product.setStock(product.getStock() - detailRequest.getQty());
 
@@ -74,10 +82,46 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
         return OrderResponse.builder()
                 .id(order.getId())
-                .date(order.getOrderDate())
+                .orderDate(order.getOrderDate())
                 .userId(order.getUser().getId())
                 .orderDetails(detailsResponse)
                 .paymentResponse(paymentResponse)
                 .build();
+    }
+
+    @Override
+    public Page<OrderResponse> getAllOrder(PaginationOrderRequest request) {
+        if (request.getPage() < 0) request.setPage(1);
+
+        Sort sort = Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy());
+        Pageable pageable = PageRequest.of((request.getPage() - 1), request.getSize(), sort);
+        Specification<Order> specification = OrderSpecification.getSpecification(request);
+
+        Page<Order> orderPage = orderRepository.findAll(specification, pageable);
+        return orderPage.map(order -> {
+            List<OrderDetailResponse> detailsResponse = order.getOrderDetails().stream()
+                    .map(detail -> OrderDetailResponse.builder()
+                            .id(detail.getId())
+                            .productId(detail.getProduct().getId())
+                            .qty(detail.getQty())
+                            .price(detail.getPrice())
+                            .build())
+                    .toList();
+
+            PaymentResponse paymentResponse = PaymentResponse.builder()
+                    .id(order.getPayment().getId())
+                    .token(order.getPayment().getToken())
+                    .redirectUrl(order.getPayment().getRedirectUrl())
+                    .transactionStatus(order.getPayment().getTransactionStatus())
+                    .build();
+
+            return OrderResponse.builder()
+                    .id(order.getId())
+                    .orderDate(order.getOrderDate())
+                    .userId(order.getUser().getId())
+                    .orderDetails(detailsResponse)
+                    .paymentResponse(paymentResponse)
+                    .build();
+        });
     }
 }
