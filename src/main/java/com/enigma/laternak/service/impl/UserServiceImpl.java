@@ -8,7 +8,6 @@ import com.enigma.laternak.dto.response.UserResponse;
 import com.enigma.laternak.entity.Account;
 import com.enigma.laternak.entity.User;
 import com.enigma.laternak.repository.UserRepository;
-import com.enigma.laternak.service.AuthService;
 import com.enigma.laternak.service.UserService;
 import com.enigma.laternak.service.UserServiceDetail;
 import com.enigma.laternak.spesification.UserSpecification;

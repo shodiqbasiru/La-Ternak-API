@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +28,7 @@ import java.util.List;
 @Tag(name = "User", description = "API for user")
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
     @Operation(
@@ -41,7 +44,8 @@ public class UserController {
             @RequestParam(name = "size", defaultValue = "10") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "customerName") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @RequestParam(name = "name", required = false) String name
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "role", required = false) String role
     ) {
         PaginationUserRequest pageRequest = PaginationUserRequest.builder()
                 .page(page)
@@ -49,12 +53,13 @@ public class UserController {
                 .sortBy(sortBy)
                 .direction(direction)
                 .customerName(name)
+                .role(role)
                 .build();
         Page<UserResponse> result = userService.getAll(pageRequest);
 
         PagingResponse paging = PagingResponse.builder()
-                .page(result.getNumber() + 1)
-                .size(result.getSize())
+                .page(result.getPageable().getPageNumber() +1)
+                .size(result.getPageable().getPageSize())
                 .totalPages(result.getTotalPages())
                 .totalElement(result.getTotalElements())
                 .hasNext(result.hasNext())

@@ -1,5 +1,6 @@
 package com.enigma.laternak.dto.request;
 
+import com.enigma.laternak.constant.UserRole;
 import lombok.*;
 
 @Getter
@@ -13,4 +14,5 @@ public class PaginationUserRequest {
     private String sortBy;
     private String direction;
     private String customerName;
+    private String role;
 }

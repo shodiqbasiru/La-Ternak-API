@@ -1,7 +1,10 @@
 package com.enigma.laternak.spesification;
 
 import com.enigma.laternak.dto.request.PaginationUserRequest;
+import com.enigma.laternak.entity.Account;
+import com.enigma.laternak.entity.Role;
 import com.enigma.laternak.entity.User;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -20,6 +23,16 @@ public class UserSpecification {
                         )
                 );
             }
+
+            if (request.getRole() != null) {
+                Join<User, Account> accountJoin = root.join("account");
+                Join<Account, Role> roleJoin = accountJoin.join("roles");
+                predicates.add(
+                        cb.equal(roleJoin.get("role"), request.getRole())
+                );
+
+            }
+
 
             return cq.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
