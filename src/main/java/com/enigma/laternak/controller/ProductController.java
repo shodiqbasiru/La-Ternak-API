@@ -154,6 +154,22 @@ public class ProductController {
     }
 
     @Operation(
+            summary = "Get Product",
+            description = "Get product by id"
+    )
+    @SecurityRequirement(name = "Authorization")
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CommonResponse<ProductResponse>> findById(@PathVariable String id) {
+        ProductResponse productResponse = productService.findOneById(id);
+        CommonResponse<ProductResponse> response = CommonResponse.<ProductResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Success Get Menu")
+                .data(productResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(
             summary = "Delete Product",
             description = "Delete product by id"
     )
