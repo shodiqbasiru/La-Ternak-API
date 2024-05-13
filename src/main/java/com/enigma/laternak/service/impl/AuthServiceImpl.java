@@ -1,7 +1,10 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.constant.UserRole;
-import com.enigma.laternak.dto.request.*;
+import com.enigma.laternak.dto.request.AuthRequest;
+import com.enigma.laternak.dto.request.EmailRequest;
+import com.enigma.laternak.dto.request.LoginRequest;
+import com.enigma.laternak.dto.request.RegisterSellerRequest;
 import com.enigma.laternak.dto.response.LoginResponse;
 import com.enigma.laternak.dto.response.LoginSellerResponse;
 import com.enigma.laternak.dto.response.RegisterResponse;
@@ -28,13 +31,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.temporal.Temporal;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -198,7 +197,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         Account account = (Account) authenticate.getPrincipal();
         Store store = account.getUser().getStore();
-        if(!store.isActive() && !store.isVerified()){
+        if (!store.isActive() && !store.isVerified()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not active");
         }
         /*if (!store.isVerified()) {
@@ -221,7 +220,7 @@ public class AuthServiceImpl implements AuthService {
         if (store.getOtp().equals(otp) && Duration.between(store.getOtpGenerateTime(), LocalDateTime.now()).getSeconds() < 60) {
             store.setVerified(true);
             store.setActive(true);
-            storeService.updateStore(store);
+            storeService.setVerifyStore(store);
             return "Your account has been verified";
         } else {
             return "Your account is not verified";

@@ -11,6 +11,6 @@ public class ReviewResponse {
         private String id;
         private Double rating;
         private String comment;
-        private String userId;
+        private String userName;
         private String productId;
 }

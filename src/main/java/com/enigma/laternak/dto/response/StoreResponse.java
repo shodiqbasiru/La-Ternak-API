@@ -16,4 +16,5 @@ public class StoreResponse {
     private String address;
     private List<ProductResponse> productDetails;
     private boolean isActive;
+    private ImageResponse imageStore;
 }

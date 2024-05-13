@@ -130,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
                 .id(review.getId())
                 .rating(review.getRating())
                 .comment(review.getComment())
-                .userId(review.getUser().getId())
+                .userName(review.getUser().getCustomerName())
                 .productId(review.getProduct().getId())
                 .build()).toList();
         return ProductResponse.builder()

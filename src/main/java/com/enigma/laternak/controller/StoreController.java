@@ -2,10 +2,13 @@ package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.dto.request.PaginationStoreRequest;
+import com.enigma.laternak.dto.request.StoreRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
 import com.enigma.laternak.dto.response.PagingResponse;
 import com.enigma.laternak.dto.response.StoreResponse;
 import com.enigma.laternak.service.StoreService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,6 +29,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
+    private final ObjectMapper objectMapper;
 
     @Operation(
             summary = "get all store",
@@ -87,6 +92,38 @@ public class StoreController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @Operation(
+            summary = "Update Store",
+            description = "Update store"
+    )
+    @SecurityRequirement(name = "Authorization")
+    @PutMapping(
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<?>> update(
+            @RequestPart(name = "store") String jsonStore,
+            @RequestPart(name = "image", required = false) MultipartFile image
+    ) {
+        CommonResponse.CommonResponseBuilder<StoreResponse> builder = CommonResponse.builder();
+        try {
+            StoreRequest request = objectMapper.readValue(jsonStore, new TypeReference<>() {
+            });
+            request.setImage(image);
+
+            StoreResponse response = storeService.updateStore(request);
+            builder.statusCode(HttpStatus.CREATED.value());
+            builder.message("Created Data Successfully");
+            builder.data(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(builder.build());
+        }catch (Exception e){
+            builder.message(e.getMessage());
+            builder.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(builder.build());
+        }
+    }
+
 
     @Operation(
             summary = "Delete Store",

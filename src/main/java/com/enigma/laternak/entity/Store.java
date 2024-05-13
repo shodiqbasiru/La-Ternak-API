@@ -22,7 +22,7 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "store_name", nullable = false, length = 50,unique = true)
+    @Column(name = "store_name", nullable = false, length = 50, unique = true)
     private String storeName;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -47,6 +47,11 @@ public class Store {
     @JsonBackReference
     @JoinColumn(name = "user_id", unique = true)
     private User user;
+
+    @OneToOne
+    @JsonBackReference
+    @JoinColumn(name = "image_store_id", unique = true)
+    private ImageStore imageStore;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "store")

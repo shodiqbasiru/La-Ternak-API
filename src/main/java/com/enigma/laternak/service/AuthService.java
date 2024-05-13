@@ -10,7 +10,7 @@ import com.enigma.laternak.dto.response.RegisterResponse;
 import com.enigma.laternak.dto.response.RegisterSellerResponse;
 import org.springframework.web.servlet.view.RedirectView;
 
-public interface AuthService {
+public interface    AuthService {
     RegisterResponse register(AuthRequest request);
     RegisterSellerResponse registerSeller(RegisterSellerRequest request);
     LoginResponse login(LoginRequest request);
