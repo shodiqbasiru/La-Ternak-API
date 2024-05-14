@@ -41,6 +41,9 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse create(ProductRequest request) {
+        if (request.getImages().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image is required");
+
         validationUtil.validate(request);
 
         Store store = storeRepository.findById(request.getStoreId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
@@ -54,12 +57,9 @@ public class ProductServiceImpl implements ProductService {
                 .build();
 
 
-        if (request.getImages() != null) {
             List<ImageProduct> imageProduct = imageProductService.create(request.getImages(), product);
             product.setImages(imageProduct);
-        } else {
             productRepository.saveAndFlush(product);
-        }
 
         return convertProductToProductResponse(product);
     }

@@ -14,6 +14,7 @@ import java.util.List;
 public class OrderResponse {
     private String id;
     private String userId;
+    private String address;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date orderDate;
     private List<OrderDetailResponse> orderDetails;

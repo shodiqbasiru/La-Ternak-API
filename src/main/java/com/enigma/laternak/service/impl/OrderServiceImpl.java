@@ -84,6 +84,7 @@ public class OrderServiceImpl implements OrderService {
                 .id(order.getId())
                 .orderDate(order.getOrderDate())
                 .userId(order.getUser().getId())
+                .address(order.getUser().getAddress())
                 .orderDetails(detailsResponse)
                 .paymentResponse(paymentResponse)
                 .build();
@@ -120,6 +121,7 @@ public class OrderServiceImpl implements OrderService {
                     .orderDate(order.getOrderDate())
                     .userId(order.getUser().getId())
                     .orderDetails(detailsResponse)
+                    .address(order.getUser().getAddress())
                     .paymentResponse(paymentResponse)
                     .build();
         });
