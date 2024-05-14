@@ -1,5 +1,6 @@
 package com.enigma.laternak.entity;
 
+import com.enigma.laternak.constant.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +20,8 @@ public class Payment {
 
     private String redirectUrl;
 
-    private String transactionStatus;
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus transactionStatus;
 
     @OneToOne(mappedBy = "payment")
     private Order order;

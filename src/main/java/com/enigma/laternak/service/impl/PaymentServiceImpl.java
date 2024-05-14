@@ -1,10 +1,13 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.TransactionStatus;
 import com.enigma.laternak.dto.request.PaymentDetailRequest;
 import com.enigma.laternak.dto.request.PaymentItemDetailRequest;
 import com.enigma.laternak.dto.request.PaymentRequest;
 import com.enigma.laternak.entity.Order;
+import com.enigma.laternak.entity.OrderDetail;
 import com.enigma.laternak.entity.Payment;
+import com.enigma.laternak.entity.Product;
 import com.enigma.laternak.repository.PaymentRepository;
 import com.enigma.laternak.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -76,9 +80,29 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = Payment.builder()
                 .token(body.get("token"))
                 .redirectUrl(body.get("redirect_url"))
-                .transactionStatus("ordered")
+                .transactionStatus(TransactionStatus.ORDERED)
                 .build();
         paymentRepository.saveAndFlush(payment);
         return payment;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void checkFailedAndUpdateStatus() {
+        List<TransactionStatus> transactionStatus = List.of(
+                TransactionStatus.DENY,
+                TransactionStatus.CANCEL,
+                TransactionStatus.EXPIRE,
+                TransactionStatus.FAILURE
+        );
+        List<Payment> payments = paymentRepository.findAllByTransactionStatusIn(transactionStatus);
+
+        for (Payment payment : payments) {
+            for (OrderDetail orderDetail : payment.getOrder().getOrderDetails()) {
+                Product product = orderDetail.getProduct();
+                product.setStock(product.getStock() + orderDetail.getQty());
+            }
+            payment.setTransactionStatus(TransactionStatus.FAILURE);
+        }
     }
 }

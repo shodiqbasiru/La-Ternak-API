@@ -1,7 +1,9 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.TransactionStatus;
 import com.enigma.laternak.dto.request.OrderRequest;
 import com.enigma.laternak.dto.request.PaginationOrderRequest;
+import com.enigma.laternak.dto.request.UpdateOrderStatusRequest;
 import com.enigma.laternak.dto.response.OrderDetailResponse;
 import com.enigma.laternak.dto.response.OrderResponse;
 import com.enigma.laternak.dto.response.PaymentResponse;
@@ -32,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final ProductService productService;
     private final PaymentService paymentService;
+    private final CartService cartService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -65,11 +68,13 @@ public class OrderServiceImpl implements OrderService {
         Payment payment = paymentService.createPayment(order);
         order.setPayment(payment);
 
+        cartService.deleteCart(request.getUserId());
+
         PaymentResponse paymentResponse = PaymentResponse.builder()
                 .id(payment.getId())
                 .token(payment.getToken())
                 .redirectUrl(payment.getRedirectUrl())
-                .transactionStatus(payment.getTransactionStatus())
+                .transactionStatus(payment.getTransactionStatus().getDescription())
                 .build();
 
         List<OrderDetailResponse> detailsResponse = orderDetails.stream()
@@ -113,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
                     .id(order.getPayment().getId())
                     .token(order.getPayment().getToken())
                     .redirectUrl(order.getPayment().getRedirectUrl())
-                    .transactionStatus(order.getPayment().getTransactionStatus())
+                    .transactionStatus(order.getPayment().getTransactionStatus().getDescription())
                     .build();
 
             return OrderResponse.builder()
@@ -125,5 +130,14 @@ public class OrderServiceImpl implements OrderService {
                     .paymentResponse(paymentResponse)
                     .build();
         });
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateStatus(UpdateOrderStatusRequest request) {
+        Order order = orderRepository.findById(request.getOrderId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
+        Payment payment = order.getPayment();
+        payment.setTransactionStatus(TransactionStatus.getByName(request.getTransactionStatus()));
+
     }
 }

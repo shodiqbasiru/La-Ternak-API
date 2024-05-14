@@ -3,6 +3,7 @@ package com.enigma.laternak.controller;
 import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.dto.request.OrderRequest;
 import com.enigma.laternak.dto.request.PaginationOrderRequest;
+import com.enigma.laternak.dto.request.UpdateOrderStatusRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
 import com.enigma.laternak.dto.response.OrderResponse;
 import com.enigma.laternak.dto.response.PagingResponse;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -92,4 +94,16 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("/status")
+    public ResponseEntity<CommonResponse<?>> updateStatus(@RequestBody Map<String, Object> request) {
+        UpdateOrderStatusRequest updateTransactionStatusRequest = UpdateOrderStatusRequest.builder()
+                .orderId(request.get("order_id").toString())
+                .transactionStatus(request.get("transaction_status").toString())
+                .build();
+        orderService.updateStatus(updateTransactionStatusRequest);
+        return ResponseEntity.ok(CommonResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Update order status successfully")
+                .build());
+    }
 }

@@ -5,4 +5,5 @@ import com.enigma.laternak.entity.Payment;
 
 public interface PaymentService {
     Payment createPayment(Order order);
+    void checkFailedAndUpdateStatus();
 }

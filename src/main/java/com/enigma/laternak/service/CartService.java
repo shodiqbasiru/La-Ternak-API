@@ -7,9 +7,11 @@ import com.enigma.laternak.entity.Cart;
 import java.util.List;
 
 public interface CartService {
-    Cart addToCart(CartRequest request);
+    void addToCart(CartRequest request);
 
     List<CartResponse> getAll();
+
+    Cart getById(String id);
 
     void deleteCart(String id);
 }

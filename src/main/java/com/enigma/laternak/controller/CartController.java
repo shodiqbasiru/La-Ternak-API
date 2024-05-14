@@ -35,15 +35,10 @@ public class CartController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<CommonResponse<CartRequest>> addToCart(@RequestBody CartRequest request) {
-        Cart cart = cartService.addToCart(request);
+        cartService.addToCart(request);
         return ResponseEntity.ok(CommonResponse.<CartRequest>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Added to cart successfully")
-                .data(CartRequest.builder()
-                        .userId(cart.getUser().getId())
-                        .productId(cart.getProduct().getId())
-                        .qty(cart.getQty())
-                        .build())
                 .build());
     }
 
