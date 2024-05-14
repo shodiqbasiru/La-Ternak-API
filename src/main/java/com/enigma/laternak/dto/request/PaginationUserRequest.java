@@ -1,6 +1,5 @@
 package com.enigma.laternak.dto.request;
 
-import com.enigma.laternak.constant.UserRole;
 import lombok.*;
 
 @Getter

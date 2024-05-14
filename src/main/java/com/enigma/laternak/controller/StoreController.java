@@ -84,7 +84,7 @@ public class StoreController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<CommonResponse<StoreResponse>> findById(@PathVariable String id) {
-        StoreResponse result = storeService.getById(id);
+        StoreResponse result = storeService.getStoreById(id);
         CommonResponse<StoreResponse> response = CommonResponse.<StoreResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Get data successfully")

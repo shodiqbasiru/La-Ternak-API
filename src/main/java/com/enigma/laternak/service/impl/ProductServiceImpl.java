@@ -12,9 +12,9 @@ import com.enigma.laternak.entity.Product;
 import com.enigma.laternak.entity.Review;
 import com.enigma.laternak.entity.Store;
 import com.enigma.laternak.repository.ProductRepository;
-import com.enigma.laternak.repository.StoreRepository;
 import com.enigma.laternak.service.ImageProductService;
 import com.enigma.laternak.service.ProductService;
+import com.enigma.laternak.service.StoreService;
 import com.enigma.laternak.spesification.ProductSpecification;
 import com.enigma.laternak.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
-    private final StoreRepository storeRepository;
+    private final StoreService storeService;
     private final ValidationUtil validationUtil;
     private final ImageProductService imageProductService;
 
@@ -46,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
 
         validationUtil.validate(request);
 
-        Store store = storeRepository.findById(request.getStoreId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found"));
+        Store store = storeService.getById(request.getStoreId());
         Product product = Product.builder()
                 .productName(request.getProductName())
                 .description(request.getDescription())
@@ -67,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Product findById(String id) {
-        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id is not found"));
+        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id is not found"));
     }
 
     @Override
@@ -79,6 +79,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ProductResponse update(UpdateProductRequest request) {
+
         Product currentProduct = findById(request.getId());
         List<ImageProduct> imageProducts = currentProduct.getImages();
 

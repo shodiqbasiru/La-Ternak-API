@@ -1,5 +1,7 @@
 package com.enigma.laternak.entity;
 
+import com.enigma.laternak.constant.OrderStatus;
+import com.enigma.laternak.constant.TransactionStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,6 +24,10 @@ public class Order {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "trx_date", updatable = false)
     private Date orderDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status")
+    private OrderStatus orderStatus;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

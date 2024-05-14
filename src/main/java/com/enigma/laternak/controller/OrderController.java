@@ -2,6 +2,7 @@ package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.dto.request.OrderRequest;
+import com.enigma.laternak.dto.request.OrderSpecificationRequest;
 import com.enigma.laternak.dto.request.PaginationOrderRequest;
 import com.enigma.laternak.dto.request.UpdateOrderStatusRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
@@ -94,6 +95,28 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(
+            summary = "Get All Order",
+            description = "Get All Order Without Pagination"
+    )
+    @SecurityRequirement(name = "Authorization")
+    @GetMapping(path = "/mobile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CommonResponse<List<OrderResponse>>> getAllOrder(
+            @RequestParam(name = "orderStatus",required = false) String orderStatus
+    ) {
+        OrderSpecificationRequest request = OrderSpecificationRequest.builder()
+                .orderStatus(orderStatus)
+                .build();
+        List<OrderResponse> order = orderService.getAllOrder(request);
+
+        CommonResponse<List<OrderResponse>> response = CommonResponse.<List<OrderResponse>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get all order successfully")
+                .data(order)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PostMapping("/status")
     public ResponseEntity<CommonResponse<?>> updateStatus(@RequestBody Map<String, Object> request) {
         UpdateOrderStatusRequest updateTransactionStatusRequest = UpdateOrderStatusRequest.builder()
@@ -105,5 +128,19 @@ public class OrderController {
                 .statusCode(HttpStatus.OK.value())
                 .message("Update order status successfully")
                 .build());
+    }
+
+    @PutMapping(
+            path = "/order-status/{id}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<OrderResponse>> updateOrderStatus(@PathVariable String id) {
+        orderService.changeStatusOrder(id);
+        CommonResponse<OrderResponse> response = CommonResponse.<OrderResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Order status updated successfully")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

@@ -42,10 +42,15 @@ public class StoreServiceImpl implements StoreService {
         return storeRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "email not found"));
     }
 
+    @Override
+    public Store getById(String id) {
+        return storeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "store not found"));
+    }
+
     @Transactional(readOnly = true)
     @Override
-    public StoreResponse getById(String id) {
-        Store store = storeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "store not found"));
+    public StoreResponse getStoreById(String id) {
+        Store store = getById(id);
         return StoreResponse.builder()
                 .id(store.getId())
                 .storeName(store.getStoreName())
@@ -98,7 +103,7 @@ public class StoreServiceImpl implements StoreService {
     public StoreResponse updateStore(StoreRequest request) {
         validationUtil.validate(request);
 
-        Store currentStore = storeRepository.findById(request.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "store not found"));
+        Store currentStore = getById(request.getId());
         ImageStore imgOld = currentStore.getImageStore();
         currentStore.setStoreName(request.getStoreName());
         currentStore.setAddress(request.getAddress());
@@ -142,7 +147,7 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteAccountSeller(String id) {
-        Store currentStore = storeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Store Not Found"));
+        Store currentStore = getById(id);
         currentStore.setVerified(false);
         currentStore.setActive(false);
     }

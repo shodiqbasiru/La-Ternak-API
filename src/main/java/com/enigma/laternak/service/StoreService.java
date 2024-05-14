@@ -11,7 +11,9 @@ public interface StoreService {
 
     Store getByEmail(String email);
 
-    StoreResponse getById(String id);
+    Store getById(String id);
+
+    StoreResponse getStoreById(String id);
 
     Page<StoreResponse> getAll(PaginationStoreRequest request);
 

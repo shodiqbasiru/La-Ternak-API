@@ -1,7 +1,9 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.OrderStatus;
 import com.enigma.laternak.constant.TransactionStatus;
 import com.enigma.laternak.dto.request.OrderRequest;
+import com.enigma.laternak.dto.request.OrderSpecificationRequest;
 import com.enigma.laternak.dto.request.PaginationOrderRequest;
 import com.enigma.laternak.dto.request.UpdateOrderStatusRequest;
 import com.enigma.laternak.dto.response.OrderDetailResponse;
@@ -44,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .orderDate(new Date())
                 .user(user)
+                .orderStatus(OrderStatus.UNPAID)
                 .build();
         orderRepository.saveAndFlush(order);
 
@@ -90,6 +93,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderDate(order.getOrderDate())
                 .userId(order.getUser().getId())
                 .address(order.getUser().getAddress())
+                .orderStatus(order.getOrderStatus().getDescription())
                 .orderDetails(detailsResponse)
                 .paymentResponse(paymentResponse)
                 .build();
@@ -104,32 +108,42 @@ public class OrderServiceImpl implements OrderService {
         Specification<Order> specification = OrderSpecification.getSpecification(request);
 
         Page<Order> orderPage = orderRepository.findAll(specification, pageable);
-        return orderPage.map(order -> {
-            List<OrderDetailResponse> detailsResponse = order.getOrderDetails().stream()
-                    .map(detail -> OrderDetailResponse.builder()
-                            .id(detail.getId())
-                            .productId(detail.getProduct().getId())
-                            .qty(detail.getQty())
-                            .price(detail.getPrice())
-                            .build())
-                    .toList();
+        return orderPage.map(OrderServiceImpl::getOrderResponse);
+    }
 
-            PaymentResponse paymentResponse = PaymentResponse.builder()
-                    .id(order.getPayment().getId())
-                    .token(order.getPayment().getToken())
-                    .redirectUrl(order.getPayment().getRedirectUrl())
-                    .transactionStatus(order.getPayment().getTransactionStatus().getDescription())
-                    .build();
+    @Override
+    public List<OrderResponse> getAllOrder(OrderSpecificationRequest request) {
+        Specification<Order> specification = OrderSpecification.getSpecification(request);
+        List<Order> orders = orderRepository.findAll(specification);
+        return orders.stream().map(OrderServiceImpl::getOrderResponse).toList();
+    }
 
-            return OrderResponse.builder()
-                    .id(order.getId())
-                    .orderDate(order.getOrderDate())
-                    .userId(order.getUser().getId())
-                    .orderDetails(detailsResponse)
-                    .address(order.getUser().getAddress())
-                    .paymentResponse(paymentResponse)
-                    .build();
-        });
+    private static OrderResponse getOrderResponse(Order order) {
+        List<OrderDetailResponse> detailsResponse = order.getOrderDetails().stream()
+                .map(detail -> OrderDetailResponse.builder()
+                        .id(detail.getId())
+                        .productId(detail.getProduct().getId())
+                        .qty(detail.getQty())
+                        .price(detail.getPrice())
+                        .build())
+                .toList();
+
+        PaymentResponse paymentResponse = PaymentResponse.builder()
+                .id(order.getPayment().getId())
+                .token(order.getPayment().getToken())
+                .redirectUrl(order.getPayment().getRedirectUrl())
+                .transactionStatus(order.getPayment().getTransactionStatus().getDescription())
+                .build();
+
+        return OrderResponse.builder()
+                .id(order.getId())
+                .orderDate(order.getOrderDate())
+                .userId(order.getUser().getId())
+                .orderStatus(order.getOrderStatus().getDescription() )
+                .orderDetails(detailsResponse)
+                .address(order.getUser().getAddress())
+                .paymentResponse(paymentResponse)
+                .build();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -138,6 +152,22 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(request.getOrderId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
         Payment payment = order.getPayment();
         payment.setTransactionStatus(TransactionStatus.getByName(request.getTransactionStatus()));
+        if (payment.getTransactionStatus() == TransactionStatus.SETTLEMENT) {
+            order.setOrderStatus(OrderStatus.PACKED);
+        }
 
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void changeStatusOrder(String id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
+        if (order.getOrderStatus() == OrderStatus.PACKED) {
+            order.setOrderStatus(OrderStatus.SEND);
+        } else if (order.getOrderStatus() == OrderStatus.SEND) {
+            order.setOrderStatus(OrderStatus.RECEIVED);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
+        }
     }
 }

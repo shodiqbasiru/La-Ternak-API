@@ -1,5 +1,6 @@
 package com.enigma.laternak.spesification;
 
+import com.enigma.laternak.dto.request.OrderSpecificationRequest;
 import com.enigma.laternak.dto.request.PaginationOrderRequest;
 import com.enigma.laternak.entity.Order;
 import com.enigma.laternak.util.DateUtil;
@@ -34,6 +35,18 @@ public class OrderSpecification {
             }
 
 
+
+            return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
+        };
+    }
+
+    public static Specification<Order> getSpecification(OrderSpecificationRequest request) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (request.getOrderStatus()!=null) {
+                predicates.add(criteriaBuilder.equal(root.get("orderStatus"), request.getOrderStatus()));
+            }
 
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };

@@ -59,7 +59,7 @@ public class CartController {
                 .build());
     }
 
-    @Operation(
+    /*@Operation(
             summary = "Delete Cart",
             description = "Delete Product In Cart"
     )
@@ -75,5 +75,24 @@ public class CartController {
                 .message("Deleted successfully")
                 .data(id)
                 .build());
+    }*/
+
+    @Operation(
+            summary = "Delete Cart By Id",
+            description = "Delete Product In Cart By Id"
+    )
+    @SecurityRequirement(name = "Authorization")
+    @DeleteMapping(
+            path = "/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<String>> deleteCartById(@PathVariable String id) {
+        cartService.deleteCartById(id);
+        return ResponseEntity.ok(CommonResponse.<String>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Deleted successfully")
+                .data(id)
+                .build());
     }
+
 }

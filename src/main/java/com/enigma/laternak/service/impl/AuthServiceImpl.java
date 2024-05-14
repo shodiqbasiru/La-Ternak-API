@@ -183,6 +183,7 @@ public class AuthServiceImpl implements AuthService {
         String userId = (account.getUser() != null) ? account.getUser().getId() : null;
         return LoginResponse.builder()
                 .userId(userId)
+                .storeId((account.getUser() != null && account.getUser().getStore() != null) ? account.getUser().getStore().getId() : null)
                 .username(account.getUsername())
                 .roles(account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                 .token(jwtToken)
