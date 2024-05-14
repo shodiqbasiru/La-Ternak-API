@@ -179,7 +179,10 @@ public class AuthServiceImpl implements AuthService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not active");
         }
         String jwtToken = jwtService.generateToken(account);
+
+        String userId = (account.getUser() != null) ? account.getUser().getId() : null;
         return LoginResponse.builder()
+                .userId(userId)
                 .username(account.getUsername())
                 .roles(account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                 .token(jwtToken)
