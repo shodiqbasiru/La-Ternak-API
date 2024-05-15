@@ -11,6 +11,8 @@ public interface UserService {
 
     User getById(String id);
 
+    UserResponse getUserById(String id);
+
     Page<UserResponse> getAll(PaginationUserRequest request);
 
     User update(UpdateUserRequest user);

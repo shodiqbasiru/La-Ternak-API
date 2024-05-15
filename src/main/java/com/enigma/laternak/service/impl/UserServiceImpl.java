@@ -38,6 +38,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUserById(String id) {
+        User user = getById(id);
+        return getUserResponse(user);
+    }
+
+    @Override
     public Page<UserResponse> getAll(PaginationUserRequest request) {
         if (request.getPage() <= 0) request.setPage(1);
 
@@ -45,23 +51,7 @@ public class UserServiceImpl implements UserService {
         Sort sort = Sort.by(Sort.Direction.fromString(request.getDirection()), request.getSortBy());
         Pageable pageable = PageRequest.of((request.getPage() - 1), request.getSize(), sort);
 
-        return userRepository.findAll(specification,pageable).map(user -> UserResponse.builder()
-                .id(user.getId())
-                .customerName(user.getCustomerName())
-                .phoneNumber(user.getPhoneNumber())
-                .address(user.getAddress())
-                .accountDetails(AccountResponse.builder()
-                        .id(user.getAccount().getId())
-                        .username(user.getAccount().getUsername())
-                        .roles(user.getAccount().getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
-                        .build())
-                .storeDetails(user.getStore() == null ? null : StoreResponse.builder()
-                        .id(user.getStore().getId())
-                        .storeName(user.getStore().getStoreName())
-                        .email(user.getStore().getEmail())
-                        .address(user.getStore().getAddress())
-                        .build())
-                .build());
+        return userRepository.findAll(specification, pageable).map(UserServiceImpl::getUserResponse);
     }
 
     @Override
@@ -78,6 +68,26 @@ public class UserServiceImpl implements UserService {
         User currentUser = getById(id);
         Account currentAccount = userServiceDetail.getUserById(currentUser.getId());
         currentAccount.setIsEnable(false);
+    }
+
+    private static UserResponse getUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .customerName(user.getCustomerName())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .accountDetails(AccountResponse.builder()
+                        .id(user.getAccount().getId())
+                        .username(user.getAccount().getUsername())
+                        .roles(user.getAccount().getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                        .build())
+                .storeDetails(user.getStore() == null ? null : StoreResponse.builder()
+                        .id(user.getStore().getId())
+                        .storeName(user.getStore().getStoreName())
+                        .email(user.getStore().getEmail())
+                        .address(user.getStore().getAddress())
+                        .build())
+                .build();
     }
 
 }

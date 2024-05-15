@@ -84,9 +84,9 @@ public class UserController {
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<CommonResponse<User>> findById(@PathVariable String id) {
-        User result = userService.getById(id);
-        CommonResponse<User> response = CommonResponse.<User>builder()
+    public ResponseEntity<CommonResponse<UserResponse>> findById(@PathVariable String id) {
+        UserResponse result = userService.getUserById(id);
+        CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Get data successfully")
                 .data(result)

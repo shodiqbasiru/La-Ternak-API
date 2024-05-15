@@ -206,10 +206,12 @@ class AuthServiceImplTest {
         String token = "jwtToken";
         Mockito.when(jwtService.generateToken(account)).thenReturn(token);
 
+        LoginResponse expected = new LoginResponse();
+        expected.setToken(token);
+        expected.setUsername(account.getUsername());
 
         LoginResponse response = authService.login(request);
-        assertEquals(token, response.getToken());
-
+        assertEquals(expected.getToken(), response.getToken());
     }
 
     @Test
