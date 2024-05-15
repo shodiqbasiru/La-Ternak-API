@@ -37,6 +37,10 @@ public class Order {
     @JoinColumn(name = "payment_id", unique = true)
     private Payment payment;
 
+//    @ManyToOne
+//    @JoinColumn(name = "store_id")
+//    private Store store;
+
     @OneToMany(mappedBy = "order")
     @JsonManagedReference
     private List<OrderDetail> orderDetails;

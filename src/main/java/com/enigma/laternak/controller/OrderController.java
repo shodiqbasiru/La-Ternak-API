@@ -65,7 +65,9 @@ public class OrderController {
             @RequestParam(name = "sortBy",defaultValue = "orderDate") String sortBy,
             @RequestParam(name = "direction",defaultValue = "asc") String direction,
             @RequestParam(name = "startDate",required = false) String startDate,
-            @RequestParam(name = "endDate",required = false) String endDate
+            @RequestParam(name = "endDate",required = false) String endDate,
+            @RequestParam(name = "orderStatus",required = false) String orderStatus,
+            @RequestParam(name = "storeId",required = false) String storeId
     ) {
         PaginationOrderRequest request = PaginationOrderRequest.builder()
                 .page(page)
@@ -74,6 +76,8 @@ public class OrderController {
                 .direction(direction)
                 .startDate(startDate)
                 .endDate(endDate)
+                .orderStatus(orderStatus)
+                .storeId(storeId)
                 .build();
         Page<OrderResponse> order = orderService.getAllOrder(request);
 
@@ -117,6 +121,25 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(
+            summary = "Get Order",
+            description = "Get order by id"
+    )
+    @SecurityRequirement(name = "Authorization")
+    @GetMapping(
+            path = "/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CommonResponse<OrderResponse>> getOrderById(@PathVariable String id) {
+        OrderResponse order = orderService.getOrderById(id);
+        CommonResponse<OrderResponse> response = CommonResponse.<OrderResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get order by id successfully")
+                .data(order)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PostMapping("/status")
     public ResponseEntity<CommonResponse<?>> updateStatus(@RequestBody Map<String, Object> request) {
         UpdateOrderStatusRequest updateTransactionStatusRequest = UpdateOrderStatusRequest.builder()
@@ -130,9 +153,8 @@ public class OrderController {
                 .build());
     }
 
-    @PutMapping(
+    @GetMapping(
             path = "/order-status/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<CommonResponse<OrderResponse>> updateOrderStatus(@PathVariable String id) {

@@ -37,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductService productService;
     private final PaymentService paymentService;
     private final CartService cartService;
+    private final UserServiceDetail userServiceDetail;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -84,6 +85,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(detail -> OrderDetailResponse.builder()
                         .id(detail.getId())
                         .productId(detail.getProduct().getId())
+                        .productName(detail.getProduct().getProductName())
                         .qty(detail.getQty())
                         .price(detail.getPrice())
                         .build())
@@ -92,11 +94,23 @@ public class OrderServiceImpl implements OrderService {
                 .id(order.getId())
                 .orderDate(order.getOrderDate())
                 .userId(order.getUser().getId())
+                .customerName(order.getUser().getCustomerName())
                 .address(order.getUser().getAddress())
                 .orderStatus(order.getOrderStatus().getDescription())
                 .orderDetails(detailsResponse)
                 .paymentResponse(paymentResponse)
                 .build();
+    }
+
+    @Override
+    public Order getById(String id) {
+        return orderRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
+    }
+
+    @Override
+    public OrderResponse getOrderById(String id) {
+        Order order = getById(id);
+        return getOrderResponse(order);
     }
 
     @Override
@@ -113,37 +127,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponse> getAllOrder(OrderSpecificationRequest request) {
+        String accountId = userServiceDetail.getByContext().getId();
         Specification<Order> specification = OrderSpecification.getSpecification(request);
         List<Order> orders = orderRepository.findAll(specification);
-        return orders.stream().map(OrderServiceImpl::getOrderResponse).toList();
-    }
-
-    private static OrderResponse getOrderResponse(Order order) {
-        List<OrderDetailResponse> detailsResponse = order.getOrderDetails().stream()
-                .map(detail -> OrderDetailResponse.builder()
-                        .id(detail.getId())
-                        .productId(detail.getProduct().getId())
-                        .qty(detail.getQty())
-                        .price(detail.getPrice())
-                        .build())
-                .toList();
-
-        PaymentResponse paymentResponse = PaymentResponse.builder()
-                .id(order.getPayment().getId())
-                .token(order.getPayment().getToken())
-                .redirectUrl(order.getPayment().getRedirectUrl())
-                .transactionStatus(order.getPayment().getTransactionStatus().getDescription())
-                .build();
-
-        return OrderResponse.builder()
-                .id(order.getId())
-                .orderDate(order.getOrderDate())
-                .userId(order.getUser().getId())
-                .orderStatus(order.getOrderStatus().getDescription() )
-                .orderDetails(detailsResponse)
-                .address(order.getUser().getAddress())
-                .paymentResponse(paymentResponse)
-                .build();
+        return orders.stream()
+                .filter(order -> order.getUser().getAccount().getId().equals(accountId))
+                .map(OrderServiceImpl::getOrderResponse).toList();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -169,5 +158,35 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
         }
+    }
+
+    private static OrderResponse getOrderResponse(Order order) {
+        List<OrderDetailResponse> detailsResponse = order.getOrderDetails().stream()
+                .map(detail -> OrderDetailResponse.builder()
+                        .id(detail.getId())
+                        .productId(detail.getProduct().getId())
+                        .productName(detail.getProduct().getProductName())
+                        .qty(detail.getQty())
+                        .price(detail.getPrice())
+                        .build())
+                .toList();
+
+        PaymentResponse paymentResponse = PaymentResponse.builder()
+                .id(order.getPayment().getId())
+                .token(order.getPayment().getToken())
+                .redirectUrl(order.getPayment().getRedirectUrl())
+                .transactionStatus(order.getPayment().getTransactionStatus().getDescription())
+                .build();
+
+        return OrderResponse.builder()
+                .id(order.getId())
+                .orderDate(order.getOrderDate())
+                .userId(order.getUser().getId())
+                .customerName(order.getUser().getCustomerName())
+                .orderStatus(order.getOrderStatus().getDescription() )
+                .orderDetails(detailsResponse)
+                .address(order.getUser().getAddress())
+                .paymentResponse(paymentResponse)
+                .build();
     }
 }

@@ -39,6 +39,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET,"api/users/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"api/stores/images/**").permitAll()
                         .requestMatchers("/api-docs/**","/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/auth/validate-token").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)

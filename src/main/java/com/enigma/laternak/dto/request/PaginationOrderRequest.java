@@ -14,4 +14,6 @@ public class PaginationOrderRequest {
     private String direction;
     private String startDate;
     private String endDate;
+    private String orderStatus;
+    private String storeId;
 }

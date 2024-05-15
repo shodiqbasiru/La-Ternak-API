@@ -43,11 +43,13 @@ class OrderServiceImplTest {
     private PaymentService paymentService;
     @Mock
     private CartService cartService;
+    @Mock
+    private UserServiceDetail userServiceDetail;
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderServiceImpl(orderRepository, orderDetailService, userService, productService, paymentService, cartService);
+        orderService = new OrderServiceImpl(orderRepository, orderDetailService, userService, productService, paymentService, cartService, userServiceDetail);
     }
 
     @Test
