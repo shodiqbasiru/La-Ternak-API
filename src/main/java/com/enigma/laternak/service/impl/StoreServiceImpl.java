@@ -1,6 +1,7 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.PaginationStoreRequest;
 import com.enigma.laternak.dto.request.StoreRequest;
 import com.enigma.laternak.dto.response.ImageResponse;
@@ -11,6 +12,7 @@ import com.enigma.laternak.entity.Store;
 import com.enigma.laternak.repository.StoreRepository;
 import com.enigma.laternak.service.ImageStoreService;
 import com.enigma.laternak.service.StoreService;
+import com.enigma.laternak.util.ResponseMessage;
 import com.enigma.laternak.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,12 +41,14 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(readOnly = true)
     @Override
     public Store getByEmail(String email) {
-        return storeRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "email not found"));
+        return storeRepository.findByEmail(email)
+                .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_EMAIL_NOT_FOUND));
     }
 
     @Override
     public Store getById(String id) {
-        return storeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "store not found"));
+        return storeRepository.findById(id)
+                .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_STORE_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

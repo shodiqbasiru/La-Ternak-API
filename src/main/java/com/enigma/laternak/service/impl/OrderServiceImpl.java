@@ -1,5 +1,6 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.constant.OrderStatus;
 import com.enigma.laternak.constant.TransactionStatus;
 import com.enigma.laternak.dto.request.OrderRequest;
@@ -13,6 +14,7 @@ import com.enigma.laternak.entity.*;
 import com.enigma.laternak.repository.OrderRepository;
 import com.enigma.laternak.service.*;
 import com.enigma.laternak.spesification.OrderSpecification;
+import com.enigma.laternak.util.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(detailRequest -> {
                     Product product = productService.findById(detailRequest.getProductId());
                     if (product.getStock() - detailRequest.getQty() < 0)
-                        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Out of stock");
+                        throw ResponseMessage.error(HttpStatus.NOT_ACCEPTABLE, Message.ERROR_OUT_OF_STOCK);
 
                     product.setStock(product.getStock() - detailRequest.getQty());
 
@@ -104,7 +106,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getById(String id) {
-        return orderRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
+        return orderRepository.findById(id)
+                .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_ORDER_NOT_FOUND));
     }
 
     @Override
@@ -138,7 +141,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateStatus(UpdateOrderStatusRequest request) {
-        Order order = orderRepository.findById(request.getOrderId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
+        Order order = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_ORDER_NOT_FOUND));
         Payment payment = order.getPayment();
         payment.setTransactionStatus(TransactionStatus.getByName(request.getTransactionStatus()));
         if (payment.getTransactionStatus() == TransactionStatus.SETTLEMENT) {
@@ -150,13 +154,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void changeStatusOrder(String id) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_ORDER_NOT_FOUND));
         if (order.getOrderStatus() == OrderStatus.PACKED) {
             order.setOrderStatus(OrderStatus.SEND);
         } else if (order.getOrderStatus() == OrderStatus.SEND) {
             order.setOrderStatus(OrderStatus.RECEIVED);
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
+            throw ResponseMessage.error(HttpStatus.BAD_REQUEST, "Invalid order status");
         }
     }
 

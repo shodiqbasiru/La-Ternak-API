@@ -1,5 +1,6 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.PaginationUserRequest;
 import com.enigma.laternak.dto.request.UpdateUserRequest;
 import com.enigma.laternak.dto.response.AccountResponse;
@@ -11,12 +12,14 @@ import com.enigma.laternak.repository.UserRepository;
 import com.enigma.laternak.service.UserService;
 import com.enigma.laternak.service.UserServiceDetail;
 import com.enigma.laternak.spesification.UserSpecification;
+import com.enigma.laternak.util.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(String id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findById(id)
+                .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_USER_NOT_FOUND));
     }
 
     @Override

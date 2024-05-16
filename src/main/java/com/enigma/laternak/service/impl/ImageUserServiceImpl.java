@@ -1,7 +1,9 @@
 package com.enigma.laternak.service.impl;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.entity.ImageUser;
 import com.enigma.laternak.repository.ImageUserRepository;
 import com.enigma.laternak.service.ImageUserService;
+import com.enigma.laternak.util.ResponseMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ public class ImageUserServiceImpl implements ImageUserService {
     public ImageUser create(MultipartFile multipartFile) {
         try{
             if(!List.of("image/jpeg", "image/png", "image/jpg").contains(multipartFile.getContentType())){
-                throw new ConstraintViolationException("Type data is false", null);
+                throw new ConstraintViolationException(Message.ERROR_IMAGE_CONTENT_TYPE.getMessage(), null);
             }
             String uniqueFileName=System.currentTimeMillis()+"_"+multipartFile.getOriginalFilename();
             Path filePath=directoryPath.resolve(uniqueFileName);
@@ -61,7 +63,7 @@ public class ImageUserServiceImpl implements ImageUserService {
             imageUserRepository.saveAndFlush(image);
             return image;
         }catch (IOException e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw ResponseMessage.error(HttpStatus.INTERNAL_SERVER_ERROR, Message.ERROR_INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -72,23 +74,23 @@ public class ImageUserServiceImpl implements ImageUserService {
         try{
             ImageUser image=imageUserRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "file not found"));
             Path path=Paths.get(image.getPath());
-            if (!Files.exists(path)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "file not found");
+            if (!Files.exists(path)) throw ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_IMAGE_NOT_FOUND);
             return new UrlResource(path.toUri());
         }catch (IOException e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw ResponseMessage.error(HttpStatus.INTERNAL_SERVER_ERROR, Message.ERROR_INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
     public void deleteById(String id) {
         try {
-            ImageUser image = imageUserRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "file not found"));
+            ImageUser image = imageUserRepository.findById(id).orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_IMAGE_NOT_FOUND));
             Path path = Paths.get(image.getPath());
-            if (!Files.exists(path)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "file not found");
+            if (!Files.exists(path)) throw ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_IMAGE_NOT_FOUND);
             Files.delete(path);
             imageUserRepository.delete(image);
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw ResponseMessage.error(HttpStatus.INTERNAL_SERVER_ERROR, Message.ERROR_INTERNAL_SERVER_ERROR);
         }
     }
 }

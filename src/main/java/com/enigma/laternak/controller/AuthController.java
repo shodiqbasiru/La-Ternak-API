@@ -1,12 +1,14 @@
 package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.AuthRequest;
 import com.enigma.laternak.dto.request.LoginRequest;
 import com.enigma.laternak.dto.request.RegisterSellerRequest;
 import com.enigma.laternak.dto.response.*;
 import com.enigma.laternak.service.AuthService;
 import com.enigma.laternak.dto.request.LoginSellerRequest;
+import com.enigma.laternak.util.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -38,7 +41,7 @@ public class AuthController {
         RegisterResponse register = authService.register(request);
         CommonResponse<RegisterResponse> response = CommonResponse.<RegisterResponse>builder()
                 .statusCode(HttpStatus.CREATED.value())
-                .message("Created a new account successfully")
+                .message(Message.SUCCESS_CREATE_ACCOUNT.getMessage())
                 .data(register)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -78,7 +81,7 @@ public class AuthController {
         LoginResponse loginResponse = authService.login(request);
         CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Login successfully")
+                .message(Message.SUCCESS_LOGIN.getMessage())
                 .data(loginResponse)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -88,7 +91,6 @@ public class AuthController {
             summary = "Login Seller",
             description = "Login Seller"
     )
-    @SecurityRequirement(name = "Authorization")
     @PostMapping(
             path = "/login-seller",
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -98,7 +100,7 @@ public class AuthController {
         LoginSellerResponse loginResponse = authService.loginSeller(request);
         CommonResponse<LoginSellerResponse> response = CommonResponse.<LoginSellerResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Login successfully")
+                .message(Message.SUCCESS_LOGIN.getMessage())
                 .data(loginResponse)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -135,7 +137,7 @@ public class AuthController {
         CommonResponse<?> response = CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())
                 .data(regenerateOtp)
-                .message("regenerate otp successfully")
+                .message(Message.SUCCESS_REGENERATE_OTP.getMessage())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -147,13 +149,13 @@ public class AuthController {
         if (isValid) {
             CommonResponse<String> response = CommonResponse.<String>builder()
                     .statusCode(HttpStatus.OK.value())
-                    .message("Get data successfully")
+                    .message(Message.SUCCESS_VALID_TOKEN.getMessage())
                     .build();
             return ResponseEntity.ok(response);
         } else {
             CommonResponse<String> response = CommonResponse.<String>builder()
                     .statusCode(HttpStatus.UNAUTHORIZED.value())
-                    .message("Invalid jwt token")
+                    .message(Message.ERROR_INVALID_JWT_TOKEN.getMessage())
                     .build();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }

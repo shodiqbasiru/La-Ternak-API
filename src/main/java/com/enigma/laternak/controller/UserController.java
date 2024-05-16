@@ -1,6 +1,7 @@
 package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.PaginationUserRequest;
 import com.enigma.laternak.dto.request.UpdateUserRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
@@ -66,7 +67,7 @@ public class UserController {
         CommonResponse<List<UserResponse>> response = CommonResponse.<List<UserResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
                 .data(result.getContent())
-                .message("Get all data successfully")
+                .message(Message.SUCCESS_GET_ALL_DATA.getMessage())
                 .pagingResponse(paging)
                 .build();
         return ResponseEntity.ok(response);
@@ -85,7 +86,7 @@ public class UserController {
         UserResponse result = userService.getUserById(id);
         CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Get data successfully")
+                .message(Message.SUCCESS_GET_DATA.getMessage())
                 .data(result)
                 .build();
         return ResponseEntity.ok(response);
@@ -104,7 +105,7 @@ public class UserController {
         User result = userService.update(request);
         CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Update data successfully")
+                .message(Message.SUCCESS_UPDATE.getMessage())
                 .data(UserResponse.builder()
                         .id(result.getId())
                         .customerName(result.getCustomerName())
@@ -129,7 +130,7 @@ public class UserController {
 
         CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Unactivated account user successfully")
+                .message(Message.SUCCESS_UNACTIVATED_ACCOUNT_CUSTOMER.getMessage())
                 .build();
         return ResponseEntity.ok(response);
     }

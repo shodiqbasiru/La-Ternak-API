@@ -1,8 +1,10 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.entity.ImageStore;
 import com.enigma.laternak.repository.ImageStoreRepository;
 import com.enigma.laternak.service.ImageStoreService;
+import com.enigma.laternak.util.ResponseMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +48,7 @@ public class ImageStoreServiceImpl implements ImageStoreService {
     public ImageStore create(MultipartFile multipartFile) {
         try {
             if (!List.of("image/jpeg", "image/jpg", "image/svg", "image/png").contains(multipartFile.getContentType()))
-                throw new ConstraintViolationException("Invalid content type", null);
+                throw new ConstraintViolationException(Message.ERROR_IMAGE_CONTENT_TYPE.getMessage(), null);
             String originalFilename = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
             Path filePath = directoryPath.resolve(originalFilename);
             Files.copy(multipartFile.getInputStream(), filePath);
@@ -70,10 +72,10 @@ public class ImageStoreServiceImpl implements ImageStoreService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
             Path filePath = Paths.get(image.getPath());
             if (!Files.exists(filePath))
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "image not found");
+                throw ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_IMAGE_NOT_FOUND);
             return new UrlResource(filePath.toUri());
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+            throw ResponseMessage.error(HttpStatus.INTERNAL_SERVER_ERROR, Message.ERROR_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -84,11 +86,11 @@ public class ImageStoreServiceImpl implements ImageStoreService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
             Path filePath = Paths.get(image.getPath());
             if (!Files.exists(filePath))
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "image not found");
+                throw ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_IMAGE_NOT_FOUND);
             Files.delete(filePath);
             imageStoreRepository.delete(image);
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+            throw ResponseMessage.error(HttpStatus.INTERNAL_SERVER_ERROR, Message.ERROR_INTERNAL_SERVER_ERROR);
         }
     }
 }

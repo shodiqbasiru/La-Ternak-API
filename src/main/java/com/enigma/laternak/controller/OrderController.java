@@ -1,6 +1,7 @@
 package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.OrderRequest;
 import com.enigma.laternak.dto.request.OrderSpecificationRequest;
 import com.enigma.laternak.dto.request.PaginationOrderRequest;
@@ -47,7 +48,7 @@ public class OrderController {
 
         CommonResponse<OrderResponse> response = CommonResponse.<OrderResponse>builder()
                 .statusCode(HttpStatus.CREATED.value())
-                .message("Order created successfully")
+                .message(Message.SUCCESS_CREATE_ORDER.getMessage())
                 .data(order)
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -60,14 +61,14 @@ public class OrderController {
     @SecurityRequirement(name = "Authorization")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<OrderResponse>>> getAllOrder(
-            @RequestParam(name = "page",defaultValue = "1") Integer page,
-            @RequestParam(name = "size",defaultValue = "10") Integer size,
-            @RequestParam(name = "sortBy",defaultValue = "orderDate") String sortBy,
-            @RequestParam(name = "direction",defaultValue = "asc") String direction,
-            @RequestParam(name = "startDate",required = false) String startDate,
-            @RequestParam(name = "endDate",required = false) String endDate,
-            @RequestParam(name = "orderStatus",required = false) String orderStatus,
-            @RequestParam(name = "storeId",required = false) String storeId
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "size", defaultValue = "10") Integer size,
+            @RequestParam(name = "sortBy", defaultValue = "orderDate") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction,
+            @RequestParam(name = "startDate", required = false) String startDate,
+            @RequestParam(name = "endDate", required = false) String endDate,
+            @RequestParam(name = "orderStatus", required = false) String orderStatus,
+            @RequestParam(name = "storeId", required = false) String storeId
     ) {
         PaginationOrderRequest request = PaginationOrderRequest.builder()
                 .page(page)
@@ -106,7 +107,7 @@ public class OrderController {
     @SecurityRequirement(name = "Authorization")
     @GetMapping(path = "/mobile", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<OrderResponse>>> getAllOrder(
-            @RequestParam(name = "orderStatus",required = false) String orderStatus
+            @RequestParam(name = "orderStatus", required = false) String orderStatus
     ) {
         OrderSpecificationRequest request = OrderSpecificationRequest.builder()
                 .orderStatus(orderStatus)
@@ -115,7 +116,7 @@ public class OrderController {
 
         CommonResponse<List<OrderResponse>> response = CommonResponse.<List<OrderResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Get all order successfully")
+                .message(Message.SUCCESS_GET_ALL_DATA.getMessage())
                 .data(order)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -134,7 +135,7 @@ public class OrderController {
         OrderResponse order = orderService.getOrderById(id);
         CommonResponse<OrderResponse> response = CommonResponse.<OrderResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Get order by id successfully")
+                .message(Message.SUCCESS_GET_DATA.getMessage())
                 .data(order)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -149,10 +150,11 @@ public class OrderController {
         orderService.updateStatus(updateTransactionStatusRequest);
         return ResponseEntity.ok(CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Update order status successfully")
+                .message(Message.SUCCESS_UPDATE.getMessage())
                 .build());
     }
 
+    @SecurityRequirement(name = "Authorization")
     @GetMapping(
             path = "/order-status/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -161,7 +163,7 @@ public class OrderController {
         orderService.changeStatusOrder(id);
         CommonResponse<OrderResponse> response = CommonResponse.<OrderResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Order status updated successfully")
+                .message(Message.SUCCESS_UPDATE_ORDER_STATUS.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -1,6 +1,7 @@
 package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.PaginationStoreRequest;
 import com.enigma.laternak.dto.request.StoreRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
@@ -87,7 +88,7 @@ public class StoreController {
         StoreResponse result = storeService.getStoreById(id);
         CommonResponse<StoreResponse> response = CommonResponse.<StoreResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Get data successfully")
+                .message(Message.SUCCESS_GET_DATA.getMessage())
                 .data(result)
                 .build();
         return ResponseEntity.ok(response);
@@ -114,7 +115,7 @@ public class StoreController {
 
             StoreResponse response = storeService.updateStore(request);
             builder.statusCode(HttpStatus.CREATED.value());
-            builder.message("Created Data Successfully");
+            builder.message(Message.SUCCESS_UPDATE.getMessage());
             builder.data(response);
             return ResponseEntity.status(HttpStatus.CREATED).body(builder.build());
         }catch (Exception e){
@@ -138,7 +139,7 @@ public class StoreController {
         storeService.deleteAccountSeller(id);
         CommonResponse<StoreResponse> response = CommonResponse.<StoreResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Unactivated account seller successfully")
+                .message(Message.SUCCESS_UNACTIVATED_ACCOUNT_SELLER.getMessage())
                 .build();
         return ResponseEntity.ok(response);
     }

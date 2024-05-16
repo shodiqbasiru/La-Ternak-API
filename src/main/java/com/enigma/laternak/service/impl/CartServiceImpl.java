@@ -1,6 +1,7 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.CartRequest;
 import com.enigma.laternak.dto.response.CartResponse;
 import com.enigma.laternak.dto.response.ImageProductResponse;
@@ -12,6 +13,7 @@ import com.enigma.laternak.service.CartService;
 import com.enigma.laternak.service.ProductService;
 import com.enigma.laternak.service.UserService;
 import com.enigma.laternak.service.UserServiceDetail;
+import com.enigma.laternak.util.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -69,7 +71,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getById(String id) {
-        return cartRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "cart not found"));
+        return cartRepository.findById(id).orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, Message.ERROR_CART_NOT_FOUND));
     }
 
     @Override

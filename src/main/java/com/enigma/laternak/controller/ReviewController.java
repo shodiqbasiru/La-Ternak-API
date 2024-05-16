@@ -1,6 +1,7 @@
 package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.ReviewRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
 import com.enigma.laternak.entity.Review;
@@ -37,7 +38,7 @@ public class ReviewController {
         Review review = reviewService.create(request);
         CommonResponse<Review> response = CommonResponse.<Review>builder()
                 .statusCode(HttpStatus.CREATED.value())
-                .message("Review created successfully")
+                .message(Message.SUCCESS_CREATE_REVIEW.getMessage())
                 .data(review)
                 .pagingResponse(null)
                 .build();
@@ -56,7 +57,7 @@ public class ReviewController {
         List<Review> reviews = reviewService.getAll();
         CommonResponse<List<Review>> response = CommonResponse.<List<Review>>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Review retrieved successfully")
+                .message(Message.SUCCESS_GET_ALL_DATA.getMessage())
                 .data(reviews)
                 .pagingResponse(null)
                 .build();
@@ -77,7 +78,7 @@ public class ReviewController {
         reviewService.DeleteById(review);
         CommonResponse<Review> response = CommonResponse.<Review>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Review deleted successfully")
+                .message(Message.SUCCESS_DELETE.getMessage())
                 .data(review)
                 .pagingResponse(null)
                 .build();

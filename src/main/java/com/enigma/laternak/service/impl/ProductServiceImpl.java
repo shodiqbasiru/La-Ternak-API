@@ -16,6 +16,7 @@ import com.enigma.laternak.service.ImageProductService;
 import com.enigma.laternak.service.ProductService;
 import com.enigma.laternak.service.StoreService;
 import com.enigma.laternak.spesification.ProductSpecification;
+import com.enigma.laternak.util.ResponseMessage;
 import com.enigma.laternak.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,9 +27,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+
+import static com.enigma.laternak.constant.Message.ERROR_IMAGE_NOT_FOUND;
+import static com.enigma.laternak.constant.Message.ERROR_PRODUCT_NOT_FOUND;
+
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
             List<ImageProduct> imageProducts = imageProductService.create(request.getImages(), product);
             product.setImages(imageProducts);
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image is required");
+            throw ResponseMessage.error(HttpStatus.NOT_FOUND, ERROR_IMAGE_NOT_FOUND);
         }
 
         return convertProductToProductResponse(product);
@@ -67,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Product findById(String id) {
-        return productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id is not found"));
+        return productRepository.findById(id).orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, ERROR_PRODUCT_NOT_FOUND));
     }
 
     @Override

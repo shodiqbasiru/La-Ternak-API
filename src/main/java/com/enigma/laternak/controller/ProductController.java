@@ -1,6 +1,7 @@
 package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.ProductRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
@@ -52,7 +53,7 @@ public class ProductController {
 
             ProductResponse response = productService.create(request);
             builder.statusCode(HttpStatus.CREATED.value());
-            builder.message("Created Data Successfully");
+            builder.message(Message.SUCCESS_CREATE_PRODUCT.getMessage());
             builder.data(response);
             return ResponseEntity.status(HttpStatus.CREATED).body(builder.build());
         } catch (Exception e) {
@@ -84,7 +85,7 @@ public class ProductController {
 
             productService.update(request);
             builder.statusCode(HttpStatus.OK.value());
-            builder.message("Update Data Successfully");
+            builder.message(Message.SUCCESS_UPDATE.getMessage());
             return ResponseEntity.status(HttpStatus.OK).body(builder.build());
         } catch (Exception e) {
             builder.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -146,7 +147,7 @@ public class ProductController {
                 .build();
         CommonResponse<List<ProductResponse>> commonResponse = CommonResponse.<List<ProductResponse>>builder()
                 .data(listProduct.getContent())
-                .message("Successfully get data")
+                .message(Message.SUCCESS_GET_ALL_DATA.getMessage())
                 .statusCode(HttpStatus.OK.value())
                 .pagingResponse(pagingResponse)
                 .build();
@@ -163,7 +164,7 @@ public class ProductController {
         ProductResponse productResponse = productService.findOneById(id);
         CommonResponse<ProductResponse> response = CommonResponse.<ProductResponse>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Success Get Menu")
+                .message(Message.SUCCESS_GET_DATA.getMessage())
                 .data(productResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -179,7 +180,7 @@ public class ProductController {
         productService.deleteById(id);
         CommonResponse<String> response = CommonResponse.<String>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Success Delete Menu")
+                .message(Message.SUCCESS_DELETE.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

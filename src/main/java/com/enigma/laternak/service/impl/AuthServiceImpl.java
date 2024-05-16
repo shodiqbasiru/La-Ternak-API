@@ -1,5 +1,6 @@
 package com.enigma.laternak.service.impl;
 
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.constant.UserRole;
 import com.enigma.laternak.dto.request.AuthRequest;
 import com.enigma.laternak.dto.request.EmailRequest;
@@ -15,6 +16,7 @@ import com.enigma.laternak.entity.Store;
 import com.enigma.laternak.entity.User;
 import com.enigma.laternak.repository.AccountRepository;
 import com.enigma.laternak.service.*;
+import com.enigma.laternak.util.ResponseMessage;
 import com.enigma.laternak.util.ValidationUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
@@ -151,16 +153,21 @@ public class AuthServiceImpl implements AuthService {
         try {
             emailService.sendEmail(emailRequest);
         } catch (MessagingException e) {
-            throw new RuntimeException("Unable to send email");
+            throw ResponseMessage.error(HttpStatus.BAD_REQUEST, Message.ERROR_UNABLE_SEND_EMAIL);
         }
 
+        // variable for response
         List<String> roles = account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+        String username = account.getUsername();
+        String email = store.getEmail();
+        String storeName = store.getStoreName();
+        boolean isVerified = store.isVerified();
 
         return RegisterSellerResponse.builder()
-                .username(account.getUsername())
-                .email(store.getEmail())
-                .storeName(store.getStoreName())
-                .isVerified(store.isVerified())
+                .username(username)
+                .email(email)
+                .storeName(storeName)
+                .isVerified(isVerified)
                 .roles(roles)
                 .build();
     }
@@ -174,18 +181,24 @@ public class AuthServiceImpl implements AuthService {
         );
         Authentication authenticate = authenticationManager.authenticate(authentication);
         SecurityContextHolder.getContext().setAuthentication(authenticate);
+
         Account account = (Account) authenticate.getPrincipal();
         if (!account.getIsEnable()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not active");
+            throw ResponseMessage.error(HttpStatus.UNAUTHORIZED, Message.ERROR_ACCOUNT_NOT_ACTIVE);
         }
+
+        // variable for response
+        String userId = (account.getUser() != null) ? account.getUser().getId() : null;
+        String storeId = (account.getUser() != null && account.getUser().getStore() != null) ? account.getUser().getStore().getId() : null;
+        String username = account.getUsername();
+        List<String> roles = account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         String jwtToken = jwtService.generateToken(account);
 
-        String userId = (account.getUser() != null) ? account.getUser().getId() : null;
         return LoginResponse.builder()
                 .userId(userId)
-                .storeId((account.getUser() != null && account.getUser().getStore() != null) ? account.getUser().getStore().getId() : null)
-                .username(account.getUsername())
-                .roles(account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .storeId(storeId)
+                .username(username)
+                .roles(roles)
                 .token(jwtToken)
                 .build();
     }
@@ -199,20 +212,28 @@ public class AuthServiceImpl implements AuthService {
         );
         Authentication authenticate = authenticationManager.authenticate(authentication);
         SecurityContextHolder.getContext().setAuthentication(authenticate);
+
+
         Account account = (Account) authenticate.getPrincipal();
         Store store = account.getUser().getStore();
-        if (!store.isActive() && !store.isVerified()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not active");
-        }
-        /*if (!store.isVerified()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Your account is not verified");
-        }*/
 
+        if (store == null) {
+            throw ResponseMessage.error(HttpStatus.UNAUTHORIZED, Message.ERROR_ACCOUNT_NOT_SELLER);
+        }
+        if (!store.isActive() && !store.isVerified()) {
+            throw ResponseMessage.error(HttpStatus.UNAUTHORIZED, Message.ERROR_ACCOUNT_NOT_ACTIVE);
+        }
+
+        // variable for response
+        String username = account.getUsername();
         String jwtToken = jwtService.generateToken(account);
+        String email = account.getUser().getStore().getEmail();
+        List<String> role = account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+
         return LoginSellerResponse.builder()
-                .username(account.getUsername())
-                .email(account.getUser().getStore().getEmail())
-                .role(account.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .username(username)
+                .email(email)
+                .role(role)
                 .token(jwtToken)
                 .build();
     }
@@ -252,7 +273,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             emailService.sendEmail(emailRequest);
         } catch (MessagingException e) {
-            throw new RuntimeException("Unable to send email");
+            throw ResponseMessage.error(HttpStatus.BAD_REQUEST, Message.ERROR_UNABLE_SEND_EMAIL);
         }
 
         store.setOtp(otp);

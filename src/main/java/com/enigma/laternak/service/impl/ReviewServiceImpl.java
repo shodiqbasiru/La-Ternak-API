@@ -8,6 +8,7 @@ import com.enigma.laternak.repository.ReviewRepository;
 import com.enigma.laternak.service.ProductService;
 import com.enigma.laternak.service.ReviewService;
 import com.enigma.laternak.service.UserService;
+import com.enigma.laternak.util.ResponseMessage;
 import com.enigma.laternak.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     @Override
     public Review getById(String id) {
-        return reviewRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found"));
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, "Review not found"));
     }
 
     @Transactional(readOnly = true)

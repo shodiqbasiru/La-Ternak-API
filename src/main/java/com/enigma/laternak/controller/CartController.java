@@ -1,6 +1,7 @@
 package com.enigma.laternak.controller;
 
 import com.enigma.laternak.constant.ApiRoute;
+import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.CartRequest;
 import com.enigma.laternak.dto.response.CartResponse;
 import com.enigma.laternak.dto.response.CommonResponse;
@@ -38,7 +39,7 @@ public class CartController {
         cartService.addToCart(request);
         return ResponseEntity.ok(CommonResponse.<CartRequest>builder()
                 .statusCode(HttpStatus.CREATED.value())
-                .message("Added to cart successfully")
+                .message(Message.SUCCESS_ADD_TO_CART.getMessage())
                 .build());
     }
 
@@ -54,7 +55,7 @@ public class CartController {
         List<CartResponse> carts = cartService.getAll();
         return ResponseEntity.ok(CommonResponse.<List<CartResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Success")
+                .message(Message.SUCCESS_GET_ALL_DATA.getMessage())
                 .data(carts)
                 .build());
     }
@@ -90,7 +91,7 @@ public class CartController {
         cartService.deleteCartById(id);
         return ResponseEntity.ok(CommonResponse.<String>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Deleted successfully")
+                .message(Message.SUCCESS_DELETE.getMessage())
                 .data(id)
                 .build());
     }
