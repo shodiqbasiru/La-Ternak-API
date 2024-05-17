@@ -4,6 +4,7 @@ import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.ReviewRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
+import com.enigma.laternak.dto.response.ReviewResponse;
 import com.enigma.laternak.entity.Review;
 import com.enigma.laternak.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,9 +35,9 @@ public class ReviewController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<CommonResponse<Review>> createReview(@RequestBody ReviewRequest request) {
-        Review review = reviewService.create(request);
-        CommonResponse<Review> response = CommonResponse.<Review>builder()
+    public ResponseEntity<CommonResponse<ReviewResponse>> createReview(@RequestBody ReviewRequest request) {
+        ReviewResponse review = reviewService.create(request);
+        CommonResponse<ReviewResponse> response = CommonResponse.<ReviewResponse>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message(Message.SUCCESS_CREATE_REVIEW.getMessage())
                 .data(review)
@@ -53,9 +54,9 @@ public class ReviewController {
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<CommonResponse<List<Review>>> getAllReview() {
-        List<Review> reviews = reviewService.getAll();
-        CommonResponse<List<Review>> response = CommonResponse.<List<Review>>builder()
+    public ResponseEntity<CommonResponse<List<ReviewResponse>>> getAllReview() {
+        List<ReviewResponse> reviews = reviewService.getAll();
+        CommonResponse<List<ReviewResponse>> response = CommonResponse.<List<ReviewResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message(Message.SUCCESS_GET_ALL_DATA.getMessage())
                 .data(reviews)
@@ -79,7 +80,6 @@ public class ReviewController {
         CommonResponse<Review> response = CommonResponse.<Review>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message(Message.SUCCESS_DELETE.getMessage())
-                .data(review)
                 .pagingResponse(null)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);

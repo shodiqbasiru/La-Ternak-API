@@ -1,6 +1,7 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.dto.request.ReviewRequest;
+import com.enigma.laternak.dto.response.ReviewResponse;
 import com.enigma.laternak.entity.Product;
 import com.enigma.laternak.entity.Review;
 import com.enigma.laternak.entity.User;
@@ -59,9 +60,9 @@ class ReviewServiceImplTest {
         Mockito.when(productService.findById(request.getProductId())).thenReturn(new Product());
         Mockito.when(reviewRepository.saveAndFlush(Mockito.any())).thenReturn(review);
 
-        Review result = reviewService.create(request);
+        ReviewResponse result = reviewService.create(request);
 
-        assertEquals(review, result);
+        assertEquals(review.getId(), result.getId());
     }
 
     @Test

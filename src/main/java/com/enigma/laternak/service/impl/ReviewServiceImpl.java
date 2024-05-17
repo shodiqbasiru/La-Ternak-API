@@ -1,6 +1,7 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.dto.request.ReviewRequest;
+import com.enigma.laternak.dto.response.ReviewResponse;
 import com.enigma.laternak.entity.Product;
 import com.enigma.laternak.entity.Review;
 import com.enigma.laternak.entity.User;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -29,17 +29,24 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Review create(ReviewRequest request) {
+    public ReviewResponse create(ReviewRequest request) {
         validationUtil.validate(request);
 
         User user = userService.getById(request.getUserId());
         Product product = productService.findById(request.getProductId());
-        return reviewRepository.saveAndFlush(Review.builder()
+        Review review = reviewRepository.saveAndFlush(Review.builder()
                 .rating(request.getRating())
                 .comment(request.getComment())
                 .product(product)
                 .user(user)
                 .build());
+        return ReviewResponse.builder()
+                .id(review.getId())
+                .rating(review.getRating())
+                .comment(review.getComment())
+                .userName(review.getUser().getAccount().getUsername())
+                .productId(review.getProduct().getId())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -49,10 +56,30 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> ResponseMessage.error(HttpStatus.NOT_FOUND, "Review not found"));
     }
 
+    @Override
+    public ReviewResponse getReviewById(String id) {
+        Review review = getById(id);
+        return ReviewResponse.builder()
+                .id(review.getId())
+                .rating(review.getRating())
+                .comment(review.getComment())
+                .userName(review.getUser().getAccount().getUsername())
+                .productId(review.getProduct().getId())
+                .build();
+    }
+
     @Transactional(readOnly = true)
     @Override
-    public List<Review> getAll() {
-        return reviewRepository.findAll();
+    public List<ReviewResponse> getAll() {
+        return reviewRepository.findAll().stream()
+                .map(review -> ReviewResponse.builder()
+                        .id(review.getId())
+                        .rating(review.getRating())
+                        .comment(review.getComment())
+                        .userName(review.getUser().getAccount().getUsername())
+                        .productId(review.getProduct().getId())
+                        .build()
+                ).toList();
     }
 
     @Transactional(rollbackFor = Exception.class)
