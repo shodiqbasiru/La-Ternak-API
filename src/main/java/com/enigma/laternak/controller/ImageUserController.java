@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(path = ApiRoute.IMAGE_USER_API)
 @Tag(name = "Image User", description = "API for Image User")
 public class ImageUserController {
     private final ImageUserService imageService;

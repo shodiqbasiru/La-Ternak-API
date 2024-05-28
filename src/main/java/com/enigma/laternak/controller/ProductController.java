@@ -3,6 +3,7 @@ package com.enigma.laternak.controller;
 import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.constant.Message;
 import com.enigma.laternak.dto.request.ProductRequest;
+import com.enigma.laternak.dto.request.ProductSpecificationRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
 import com.enigma.laternak.dto.response.CommonResponse;
@@ -94,28 +95,41 @@ public class ProductController {
         }
     }
 
-//    @Operation(
-//            summary = "Get All",
-//            description = "Get all product"
-//    )
-//    @SecurityRequirement(name = "Authorization")
-//    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<CommonResponse<List<ProductResponse>>> findAll() {
-//        List<ProductResponse> listProduct = productService.findAll();
-//        CommonResponse<List<ProductResponse>> commonResponse = CommonResponse.<List<ProductResponse>>builder()
-//                .data(listProduct)
-//                .message("Successfully get data")
-//                .statusCode(HttpStatus.OK.value())
-//                .build();
-//        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-//    }
-
     @Operation(
             summary = "Get All",
             description = "Get all product"
     )
     @SecurityRequirement(name = "Authorization")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CommonResponse<List<ProductResponse>>> findAll(
+            @RequestParam(name = "productName", required = false) String productName,
+            @RequestParam(name = "minPrice", required = false) Integer minPrice,
+            @RequestParam(name = "maxPrice", required = false) Integer maxPrice,
+            @RequestParam(name = "sortBy", defaultValue = "createdAt") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "desc") String direction
+    ) {
+        ProductSpecificationRequest request = new ProductSpecificationRequest();
+        request.setProductName(productName);
+        request.setMinPrice(minPrice);
+        request.setMaxPrice(maxPrice);
+        request.setSortBy(sortBy);
+        request.setSortDirection(direction);
+
+        List<ProductResponse> listProduct = productService.findAll(request);
+        CommonResponse<List<ProductResponse>> commonResponse = CommonResponse.<List<ProductResponse>>builder()
+                .data(listProduct)
+                .message("Successfully get data")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
+    @Operation(
+            summary = "Get All",
+            description = "Get all product"
+    )
+    @SecurityRequirement(name = "Authorization")
+    @GetMapping(path = "/pagination", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<List<ProductResponse>>> findAll(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "10") Integer size,
