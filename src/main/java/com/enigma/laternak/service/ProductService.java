@@ -1,6 +1,7 @@
 package com.enigma.laternak.service;
 
 import com.enigma.laternak.dto.request.ProductRequest;
+import com.enigma.laternak.dto.request.ProductSpecificationRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
 import com.enigma.laternak.dto.response.ProductResponse;
@@ -16,5 +17,5 @@ public interface ProductService {
     ProductResponse update(UpdateProductRequest product);
     void deleteById(String id);
     Page<ProductResponse> findAll(SearchProductRequest request);
-    List<ProductResponse> findAll();
+    List<ProductResponse> findAll(ProductSpecificationRequest request);
 }

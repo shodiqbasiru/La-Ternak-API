@@ -2,6 +2,7 @@ package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.constant.ApiRoute;
 import com.enigma.laternak.dto.request.ProductRequest;
+import com.enigma.laternak.dto.request.ProductSpecificationRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
 import com.enigma.laternak.dto.response.ImageProductResponse;
@@ -28,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.enigma.laternak.constant.Message.ERROR_IMAGE_NOT_FOUND;
@@ -55,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
                 .stock(request.getStock())
                 .price(request.getPrice())
                 .store(store)
+                .createdAt(new Date())
                 .isActive(true)
                 .build();
 
@@ -119,8 +122,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> findAll() {
-        return productRepository.findAll().stream().map(this::convertProductToProductResponse).toList();
+    public List<ProductResponse> findAll(ProductSpecificationRequest request) {
+        Specification<Product> specification = ProductSpecification.getSpecification(request);
+        Sort sort = Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy());
+        return productRepository.findAll(specification, sort).stream().map(this::convertProductToProductResponse).toList();
     }
 
     private ProductResponse convertProductToProductResponse(Product product) {

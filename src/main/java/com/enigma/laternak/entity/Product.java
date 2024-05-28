@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -33,6 +34,10 @@ public class Product {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", updatable = false)
+    private Date createdAt;
 
     @ManyToOne
     @JsonBackReference

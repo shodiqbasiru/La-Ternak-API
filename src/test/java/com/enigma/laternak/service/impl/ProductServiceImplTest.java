@@ -1,6 +1,7 @@
 package com.enigma.laternak.service.impl;
 
 import com.enigma.laternak.dto.request.ProductRequest;
+import com.enigma.laternak.dto.request.ProductSpecificationRequest;
 import com.enigma.laternak.dto.request.SearchProductRequest;
 import com.enigma.laternak.dto.request.UpdateProductRequest;
 import com.enigma.laternak.dto.response.ImageProductResponse;
@@ -324,7 +325,7 @@ class ProductServiceImplTest {
 
         Mockito.when(productRepository.findAll()).thenReturn(Collections.singletonList(product));
 
-        List<ProductResponse> result = productService.findAll();
+        List<ProductResponse> result = productService.findAll(ProductSpecificationRequest.builder().build());
 
         assertNotNull(result);
         assertEquals(1, result.size());
